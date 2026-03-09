@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div id='calendar' style="max-width: 900px; margin: 40px auto;"></div>
+
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+    
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'dayGridMonth',
+          
+          customButtons: {
+            addEventButton: {
+              text: '+',
+              click: function() {
+                window.location.href="/templates/doodle.html";
+              }
+            }
+          },
+          
+          headerToolbar: {
+            left: 'dayGridMonth,timeGridWeek,timeGridDay',
+            center: 'title',
+            right: 'prev,today,next addEventButton'
+          },
+          
+          // The data placeholder for the Python backend
+          events: {{ events_data | default('[]') | tojson | safe }}
+        });
+        
+        calendar.render();
+      });
+    </script>
+{% endblock %}

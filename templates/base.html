@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Our Team App</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* This applies the new font to everything on the page */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f5f7; /* A modern, very soft grey background */
+            color: #333333; /* Dark grey text is easier to read than pure black */
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Let's quickly clean up your navigation bar too */
+        nav {
+            background-color: #ffffff;
+            padding: 20px 40px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* A soft drop shadow */
+        }
+
+        nav a {
+            text-decoration: none; /* Removes the default blue underline */
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <!-- <a href="/">Home</a> -->
+    </nav>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+</body>
+</html>
