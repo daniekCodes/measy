@@ -9,24 +9,21 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
     <style>
-        /* This applies the new font to everything on the page */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f4f5f7; /* A modern, very soft grey background */
-            color: #333333; /* Dark grey text is easier to read than pure black */
+            background-color: #f4f5f7;
+            color: #333333;
             margin: 0;
             padding: 0;
         }
-
-        /* Let's quickly clean up your navigation bar too */
         nav {
             background-color: #ffffff;
             padding: 20px 40px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* A soft drop shadow */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
         nav a {
-            text-decoration: none; /* Removes the default blue underline */
+            text-decoration: none;
             color: #2c3e50;
             font-weight: 600;
             font-size: 16px;
@@ -36,11 +33,13 @@
 <body>
 
     <nav>
-        <div class="role-switcher">
+        <div class="role">
         <label for="active-role">Viewing as: </label>
         <select id="active-role">
             <option value="1">Admin</option>
             <option value="2">User</option>
+          <!-- to send to backend:
+          var currentUserId = document.getElementById('active-role').value; -->
         </select>
     </div>
     </nav>

@@ -16,7 +16,7 @@
             addEventButton: {
               text: '+',
               click: function() {
-                window.location.href="/templates/doodle.html";
+                window.location.href="create-event.html";
               }
             }
           },
@@ -25,9 +25,9 @@
             left: 'dayGridMonth,timeGridWeek,timeGridDay',
             center: 'title',
             right: 'prev,today,next addEventButton'
+              // next{% if user_role == "admin" %}
           },
-          
-          // The data placeholder for the Python backend
+
           events: {{ events_data | default('[]') | tojson | safe }}
         });
         
