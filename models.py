@@ -1,0 +1,1 @@
+# Alle Tabellen als SQLAlchemy-Klassen
