@@ -163,7 +163,89 @@ def update_attendance(id, appointment_id=None, status_attend=None):
             else:
                 print(f"Invalid status_attend '{status_attend}' - status_attend remains '{attendance.status_attend}'")
         session.commit()
-
 # Attendance records are never deleted - users can only decline via update_attendance
 
+def create_poll(appointment_id, description):
+    with Session(engine) as session:
+        new_poll = Poll(appointment_id=appointment_id, description=description)
+        session.add(new_poll)
+        session.commit()
 
+def get_poll_by_id(id):
+    with Session(engine) as session:
+        poll = session.get(Poll, id)
+        return poll
+
+def update_poll(id, appointment_id=None, description=None):
+    with Session(engine) as session:
+        poll = session.get(Poll, id)
+        if appointment_id is not None:
+            poll.appointment_id = appointment_id
+        if description is not None:
+            poll.description = description
+        session.commit()
+
+def delete_poll(id):
+    with Session(engine) as session:
+        poll = session.get(Poll, id)
+        session.delete(poll)
+        session.commit()
+
+def create_choice(poll_id, label):
+    with Session(engine) as session:
+        new_choice = Choice(poll_id=poll_id, label=label)
+        session.add(new_choice)
+        session.commit()
+
+def get_choice_by_id(id):
+    with Session(engine) as session:
+        choice = session.get(Choice, id)
+        return choice
+
+def update_choice(id, poll_id=None, label=None):
+    with Session(engine) as session:
+        choice = session.get(Choice, id)
+        if poll_id is not None:
+            choice.poll_id = poll_id
+        if label is not None:
+            choice.label = label
+        session.commit()
+
+def delete_choice(id):
+    with Session(engine) as session:
+        choice = session.get(Choice, id)
+        session.delete(choice)
+        session.commit()
+
+def create_vote(user_id, choice_id, can_attend=False):
+    with Session(engine) as session:
+        new_vote = Vote(user_id=user_id, choice_id=choice_id, can_attend=can_attend)
+        session.add(new_vote)
+        session.commit()
+
+def get_vote_by_id(id):
+    with Session(engine) as session:
+        vote = session.get(Vote, id)
+        return vote
+
+def get_votes_by_choice(choice_id, can_attend=None):
+    with Session(engine) as session:
+        query = session.query(Vote).filter(Vote.choice_id == choice_id)
+        if can_attend is not None:
+            query = query.filter(Vote.can_attend == can_attend)
+        return query.all()
+
+def update_vote(id, choice_id=None, can_attend=None):
+    with Session(engine) as session:
+        vote = session.get(Vote, id)
+        if choice_id is not None:
+            vote.choice_id = choice_id
+        if can_attend is not None:
+            vote.can_attend = can_attend
+        session.commit()
+
+def delete_vote(id):
+    with Session(engine) as session:
+        vote = session.get(Vote, id)
+        session.delete(vote)
+        session.commit()

@@ -69,6 +69,7 @@ class Poll(Base):
     description = Column(String, nullable=True)
 
 class Choice(Base):
+    # Answer options for a poll - users vote on these
     __tablename__ = 'choice'
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     poll_id = Column(Integer, ForeignKey('poll.id'), nullable=False)
