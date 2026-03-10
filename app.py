@@ -2,17 +2,15 @@ from flask import Flask, render_template
 
 app = Flask(__name__)
 
-@app.route('/')
+# Routing for home
+@app.route("/")
 def home():
-    # mock data
-    mock_events = [
-        {"title": "Frontend Review", "start": "2026-03-12"},
-        {"title": "Database Update", "start": "2026-03-15"}
-    ]
+    return render_template("index.html")
 
-    # return to backend
-    return render_template('index.html', events_data=mock_events)
+# Routing for Create Event page
+@app.route("/create_event")
+def create_event():
+    return render_template("create_event.html")
 
-
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True) # server restarts automatically with changes

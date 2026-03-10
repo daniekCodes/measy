@@ -31,23 +31,12 @@
     </style>
 </head>
 <body>
-
     <nav>
-        <div class="role">
-        <label for="active-role">Viewing as: </label>
-        <select id="active-role">
-            <option value="1">Admin</option>
-            <option value="2">User</option>
-          <!-- to send to backend:
-          var currentUserId = document.getElementById('active-role').value; -->
-        </select>
-    </div>
+        <a href="/">Home</a>
     </nav>
-
     <main>
-        {% block content %}
+        {%$ block content %}
         {% endblock %}
     </main>
-
 </body>
 </html>
