@@ -1,16 +1,17 @@
-# Alle Tabellen als SQLAlchemy-Klassen
+"""
+Database model: All tables as SQLAlchemy ORM classes.
 
-# Datentypen und Tabellenregeln (Constraints) für Spalten.
-# Explizite Variante, um sqlalchemy.Integer etc. zu vermeiden
+User → Appointment ← Location
+User → Attendance  → Appointment
+Appointment → Poll → Choice → Vote ← User
+"""
+
 from sqlalchemy import Column, Integer, String, CheckConstraint, ForeignKey, DateTime, Float, Boolean
-# Basisklasse, von der alle Tabellen-Klassen erben
 from sqlalchemy.orm import DeclarativeBase
 
-#Instanz der Basisklasse -> Vererbung
+# Base class: every subclass is automatically registered as a database model
 class Base(DeclarativeBase):
     pass
-
-# Reihenfolge der Klassen kann relevant sein, daher auf die Reihenfolge der Referenzen achten.
 
 class User(Base):
     __tablename__ = 'user'
@@ -20,12 +21,12 @@ class User(Base):
     password = Column(String, nullable=False)
     role = Column(String, default = 'user', nullable=False)
 
-    # __table_args__ definiert Regeln für die gesamte Tabelle (z.B. CHECK-Constraints)
-    # CheckConstraint prüft ob der Wert einer Spalte nur bestimmte Werte annehmen darf
+    # Table-wide constraints – tuple required, hence the trailing comma
     __table_args__ = (
-        CheckConstraint("role IN ('admin','user')"),  # Komma, da dies ein Tupel ist
+        CheckConstraint("role IN ('admin','user')"),
     )
 
+# Depending on meeting_type, either lat/lon or virtual_location is populated
 class Location(Base):
     __tablename__ = 'location'
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
@@ -48,6 +49,7 @@ class Appointment(Base):
     start_datetime = Column(DateTime, nullable=True)
     end_datetime = Column(DateTime, nullable=True)
 
+# Attendance status of a user for a given appointment
 class Attendance(Base):
     __tablename__ = 'attendance'
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
@@ -59,6 +61,7 @@ class Attendance(Base):
         CheckConstraint("status_attend IN ('invited','confirmed','declined')"),
     )
 
+# Poll → Choice → Vote form the voting system of an appointment
 class Poll(Base):
     __tablename__ = 'poll'
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
