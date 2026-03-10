@@ -166,6 +166,7 @@ def update_attendance(id, appointment_id=None, status_attend=None):
 # Attendance records are never deleted - users can only decline via update_attendance
 
 def create_poll(appointment_id, description):
+    # A poll belongs to one appointment and contains multiple choices
     with Session(engine) as session:
         new_poll = Poll(appointment_id=appointment_id, description=description)
         session.add(new_poll)
@@ -192,6 +193,7 @@ def delete_poll(id):
         session.commit()
 
 def create_choice(poll_id, label):
+    # label: the text of the answer option (e.g. 'Monday', 'Yes', 'No')
     with Session(engine) as session:
         new_choice = Choice(poll_id=poll_id, label=label)
         session.add(new_choice)
@@ -218,6 +220,7 @@ def delete_choice(id):
         session.commit()
 
 def create_vote(user_id, choice_id, can_attend=False):
+    # can_attend: True = user can attend at this choice's time, False = cannot
     with Session(engine) as session:
         new_vote = Vote(user_id=user_id, choice_id=choice_id, can_attend=can_attend)
         session.add(new_vote)
@@ -229,6 +232,7 @@ def get_vote_by_id(id):
         return vote
 
 def get_votes_by_choice(choice_id, can_attend=None):
+    # returns all votes for a choice, optionally filtered by can_attend
     with Session(engine) as session:
         query = session.query(Vote).filter(Vote.choice_id == choice_id)
         if can_attend is not None:
