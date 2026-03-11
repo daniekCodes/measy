@@ -26,11 +26,15 @@ class User(Base):
         CheckConstraint("role IN ('admin','user')"),
     )
 
-# Depending on meeting_type, either lat/lon or virtual_location is populated
+# Depending on meeting_type, either physical address/coordinates or virtual_location is populated
 class Location(Base):
     __tablename__ = 'location'
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     meeting_type = Column(String, nullable=False)
+    street = Column(String, nullable=True)
+    house_number = Column(String, nullable=True)
+    postal_code = Column(String, nullable=True)
+    city = Column(String, nullable=True)
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
     virtual_location = Column(String, nullable=True)

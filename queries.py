@@ -5,7 +5,8 @@ Validation for constrained fields (role, meeting_type, status_attend) is handled
 
 from sqlalchemy.orm import Session
 from database import engine
-from models import User, Location, Appointment, Attendance, Poll, Choice, Vote
+from models import User, Appointment, Attendance, Poll, Choice, Vote, Location
+
 
 def create_user(name, email, password, role='user'):
     # role: 'user' (default) or 'admin'
@@ -47,15 +48,20 @@ def delete_user(id):
         session.delete(user)
         session.commit()
 
-def create_location(meeting_type, latitude=None, longitude=None, virtual_location=None):
-    # meeting_type: 'physical' (requires lat/long) or 'virtual' (requires virtual_location)
+def create_location(meeting_type, latitude=None, longitude=None, street=None,
+                    house_number=None, postal_code=None, city=None, virtual_location=None):
+    # meeting_type: 'physical' (requires physical address/coordinates) or 'virtual' (requires virtual_location)
     # fields for the other type must be None - validated before insert
     with Session(engine) as session:
         if meeting_type == 'physical' and virtual_location is not None:
             raise ValueError("physical location does not allow virtual_location")
-        if meeting_type == 'virtual' and (latitude is not None or longitude is not None):
-            raise ValueError("virtual location does not allow latitude and longitude")
-        new_location = Location(meeting_type=meeting_type, latitude=latitude, longitude=longitude, virtual_location=virtual_location)
+        if meeting_type == 'virtual' and (latitude is not None or longitude is not None
+                                          or street is not None or house_number is not None
+                                          or postal_code is not None or city is not None):
+            raise ValueError("virtual location does not allow physical address/coordinates")
+        new_location = Location(meeting_type=meeting_type, latitude=latitude, longitude=longitude,
+                                street=street, house_number=house_number, postal_code=postal_code,
+                                city=city, virtual_location=virtual_location)
         session.add(new_location)
         session.commit()
 
@@ -64,7 +70,8 @@ def get_location_by_id(id):
         location = session.get(Location, id)
         return location
 
-def update_location(id, meeting_type=None, latitude=None, longitude=None, virtual_location=None):
+def update_location(id, meeting_type=None, latitude=None, longitude=None, street=None,
+                    house_number=None, postal_code=None, city=None, virtual_location=None):
     # use new meeting_type if provided, otherwise keep existing one from DB
     with Session(engine) as session:
         location = session.get(Location, id)
@@ -73,25 +80,36 @@ def update_location(id, meeting_type=None, latitude=None, longitude=None, virtua
         effective_type = meeting_type if meeting_type is not None else location.meeting_type
         if effective_type == 'physical' and virtual_location is not None:
             raise ValueError("physical location does not allow virtual_location")
-        if effective_type == 'virtual' and (latitude is not None or longitude is not None):
-            raise ValueError("virtual location does not allow latitude and longitude")
-
+        if effective_type == 'virtual' and (latitude is not None or longitude is not None
+                                            or street is not None or house_number is not None
+                                            or postal_code is not None or city is not None):
+            raise ValueError("virtual location does not allow physical address/coordinates")
         if meeting_type is not None:
             location.meeting_type = meeting_type
             if meeting_type == 'virtual':
-                print("latitude and longitude removed - virtual_location can now be set")
+                print("physical address/coordinates removed - virtual_location can now be set")
                 location.latitude = None
                 location.longitude = None
+                location.street = None
+                location.house_number = None
+                location.postal_code = None
+                location.city = None
             if meeting_type == 'physical':
-                print("virtual_location removed - latitude and longitude can now be set")
+                print("virtual_location removed - physical address/coordinates can now be set")
                 location.virtual_location = None
         if latitude is not None:
             location.latitude = latitude
         if longitude is not None:
             location.longitude = longitude
+        if street is not None:
+            location.street = street
+        if house_number is not None:
+            location.house_number = house_number
+        if postal_code is not None:
+            location.postal_code = postal_code
+        if city is not None:
+            location.city = city
         if virtual_location is not None:
-            if meeting_type == 'physical' and virtual_location is not None:
-                raise ValueError("physical location does not allow virtual_location")
             location.virtual_location = virtual_location
         session.commit()
 
