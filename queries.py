@@ -15,6 +15,10 @@ def create_user(name, email, password, role='user'):
         session.add(new_user)
         session.commit()
 
+def get_all_users():
+    with Session(engine) as session:
+        return session.query(User).all()
+
 def get_user_by_id(id):
     with Session(engine) as session:
         user = session.get(User, id)
@@ -124,6 +128,10 @@ def create_appointment(title, organiser_id, location_id, description=None, start
         new_appointment = Appointment(title=title, user_id=organiser_id, location_id=location_id, description=description, start_datetime=start_datetime, end_datetime=end_datetime)
         session.add(new_appointment)
         session.commit()
+
+def get_all_appointments():
+    with Session(engine) as session:
+        return session.query(Appointment).all()
 
 def get_appointment_by_id(id):
     with Session(engine) as session:
