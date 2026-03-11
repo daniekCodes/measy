@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="16a52151-88d8-4a25-a4ca-02338f6a0770" name="Changes" comment="new logic + app.create_doodle()" />
+    <list default="true" id="16a52151-88d8-4a25-a4ca-02338f6a0770" name="Changes" comment="blablabla" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -42,12 +42,15 @@
     &quot;assignee&quot;: &quot;doSosCode&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/daniekCodes/measy",
-    "accountId": "cd88f17c-12d1-40ed-8ca5-df67034504b8"
+  <component name="GithubDefaultAccount">
+    <option name="defaultAccountId" value="cd88f17c-12d1-40ed-8ca5-df67034504b8" />
+  </component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/daniekCodes/measy&quot;,
+    &quot;accountId&quot;: &quot;cd88f17c-12d1-40ed-8ca5-df67034504b8&quot;
   }
-}]]></component>
+}</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/.venv/doodle.py" root0="SKIP_INSPECTION" />
   </component>
@@ -68,7 +71,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "ai.playground.ignore.import.keys.banner.in.settings": "true",
-    "git-widget-placeholder": "dev",
+    "git-widget-placeholder": "doodle",
     "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
     "vue.rearranger.settings.migration": "true"
   }
@@ -115,7 +118,15 @@
       <option name="project" value="LOCAL" />
       <updated>1773233927675</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="blablabla">
+      <option name="closed" value="true" />
+      <created>1773235769785</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1773235769785</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -163,7 +174,8 @@
     <MESSAGE value="doodle functionality with datetime" />
     <MESSAGE value="working (poll_dates())" />
     <MESSAGE value="new logic + app.create_doodle()" />
-    <option name="LAST_COMMIT_MESSAGE" value="new logic + app.create_doodle()" />
+    <MESSAGE value="blablabla" />
+    <option name="LAST_COMMIT_MESSAGE" value="blablabla" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/M_Easy$doodle.coverage" NAME="doodle Coverage Results" MODIFIED="1773222500078" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/.venv" />
