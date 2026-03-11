@@ -15,5 +15,7 @@ def create_doodle(appointment_id):
         queries.create_choice(poll.id, dateentry)
     return redirect(url_for("appointments", appointments=appointment(id)))
 
+#blablablablabla
+
 if __name__ == '__main__':
     app.run(debug=True)
