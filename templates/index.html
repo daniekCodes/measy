@@ -1,15 +1,33 @@
 {%extends "base.html"%}
 {%block content%}
+
 <div class="main_container">
+
     <div class="main_table">
-        <h3>Events created by me</h3>
-        <ul>
+        <h3>Meine Events</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Event</th>
+                <th>Datum</th>
+                <th>Organisator</th>
+            </tr>
+            </thead>
+            <tbody>
             {%for event in events%}
-            <li>{{event.date}}: {{event.title}}</li>
+            <tr>
+                <td>{{event.title}}</td>
+                <td>{{event.date}}</td>
+                <td>{{event.organiser}}</td>
+            </tr>
             {%else%}
-            <li>No Events Created</li>
+            <tr>
+                <td>Keine Events zugewiesen</td>
+            </tr>
             {%endfor%}
-        </ul>
+            </tbody>
+        </table>
+
     </div>
 
     <div class="main_table">

@@ -1,20 +1,20 @@
 {%extends "base.html"%}
 {%block content%}
 
-<h2>New Event</h2>
+<h2>Neues Event</h2>
 
 <form id="create_event_form"
       action="/create_event"
       method="POST">
     <div>
-        <label for="title">Title</label>
+        <label for="title">Titel</label>
         <input type="text"
                name="title"
                id="title"/>
     </div>
 
     <div>
-        <label for="description">Description</label>
+        <label for="description">Beschreibung</label>
         <input type="text"
                name="description"
                id="description"/>
@@ -22,14 +22,14 @@
 
     <div>
         <fieldset>
-            <legend>Location Type:</legend>
+            <legend>Vor Ort oder Online?</legend>
             <label>
                 <input type="radio"
                        name="location_type"
                        value="physical"
                        required
                        onchange="location_toggle()">
-                On location
+                Vor Ort
             </label>
             <label>
                 <input
@@ -66,14 +66,14 @@
 
     <div>
         <fieldset>
-            <legend>Doodle or fixed appointment?</legend>
+            <legend>Steht das Datum fest?</legend>
             <label>
                 <input type="radio"
                        name="meeting_type"
                        value="fixed_meeting"
                        required
                        onchange="meeting_toggle()">
-                Fixed appointment
+                Festes Datum
             </label>
             <label>
                 <input
@@ -81,7 +81,7 @@
                         name="meeting_type"
                         value="doodle"
                         onchange="meeting_toggle()">
-                Doodle
+                Abstimmung
             </label>
         </fieldset>
         <!-- for fixed radiobutton -->
@@ -108,8 +108,9 @@
             </div>
         </div>
     </div>
-    <button type="submit">Save Event</button>
+    <button type="submit">Speichern</button>
 </form>
 
-<script src="{{ url_for('static', filename='main.js') }}"></script>
+<script src="{{url_for('static', filename='main.js')}}"></script>
+
 {%endblock%}

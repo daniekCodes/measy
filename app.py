@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
@@ -6,17 +6,15 @@ app = Flask(__name__)
 
 # Routing for home
 @app.route("/")
-def home():
-    return render_template(
-        "index.html",
-        events=[], # for events fetch
-        invitations=[], # for invitations fetch
-        polls=[] # for polls fetch
-    )
+def main():
+    return render_template("index.html")
 
 # Routing for Create Event page
-@app.route("/create_event")
+@app.route("/create_event", methods=["GET", "POST"])
 def create_event():
+    # when clicking save
+    if request.method == "POST":
+        return redirect(url_for("main"))
     return render_template("create_event.html")
 
 if __name__ == "__main__":
