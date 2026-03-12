@@ -9,9 +9,9 @@ app = Flask(__name__)
 def home():
     return render_template(
         "index.html",
-        events=[],
-        invitations=[],
-        polls=[]
+        events=[], # for events fetch
+        invitations=[], # for invitations fetch
+        polls=[] # for polls fetch
     )
 
 # Routing for Create Event page

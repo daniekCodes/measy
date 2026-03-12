@@ -3,16 +3,18 @@
 
 <h2>New Event</h2>
 
-<form id="create_event_form">
+<form id="create_event_form"
+      action="/create_event"
+      method="POST">
     <div>
-        <label>Title</label>
+        <label for="title">Title</label>
         <input type="text"
                name="title"
                id="title"/>
     </div>
 
     <div>
-        <label>Description</label>
+        <label for="description">Description</label>
         <input type="text"
                name="description"
                id="description"/>
@@ -28,7 +30,6 @@
                        required
                        onchange="location_toggle()">
                 On location
-                </input>
             </label>
             <label>
                 <input
@@ -37,9 +38,30 @@
                         value="virtual"
                         onchange="location_toggle()">
                 Online
-                </input>
             </label>
         </fieldset>
+        <!-- for physical radiobutton -->
+        <div id="physical_placeholder">
+            <input type="text"
+                   name="street"
+                   placeholder="Straße"/>
+            <input type="text"
+                   name="housenumber"
+                   placeholder="Hausnummer">
+            <br>
+            <input type="text"
+                   name="plz"
+                   placeholder="Postleitzahl">
+            <input type="text"
+                   name="city"
+                   placeholder="Stadt">
+        </div>
+        <!-- for online radiobutton -->
+        <div id="online_placeholder">
+            <input type="url"
+                   name="meeting_link"
+                   placeholder="URL zu Meeting">
+        </div>
     </div>
 
     <div>
@@ -48,11 +70,10 @@
             <label>
                 <input type="radio"
                        name="meeting_type"
-                       value="fixed"
+                       value="fixed_meeting"
                        required
                        onchange="meeting_toggle()">
                 Fixed appointment
-                </input>
             </label>
             <label>
                 <input
@@ -61,11 +82,34 @@
                         value="doodle"
                         onchange="meeting_toggle()">
                 Doodle
-                </input>
             </label>
         </fieldset>
+        <!-- for fixed radiobutton -->
+        <div id="fixed_placeholder">
+            <input type="date" name="fixed_date">
+            <input type="time" name="fixed_time">
+        </div>
+        <!-- for doodle radiobutton -->
+        <div id="doodle_placeholder">
+            <div>
+                <label>Option 1</label>
+                <input type="date" name="option1_date">
+                <input type="time" name="option1_time">
+            </div>
+            <div>
+                <label>Option 2</label>
+                <input type="date" name="option2_date">
+                <input type="time" name="option2_time">
+            </div>
+            <div>
+                <label>Option 3</label>
+                <input type="date" name="option3_date">
+                <input type="time" name="option3_time">
+            </div>
+        </div>
     </div>
+    <button type="submit">Save Event</button>
 </form>
 
-
+<script src="{{ url_for('static', filename='main.js') }}"></script>
 {%endblock%}
