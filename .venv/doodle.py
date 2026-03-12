@@ -35,10 +35,10 @@ doodle_dates = []
 # Todo:
 # Frontend Daten abgreifen
 # if [Daten Input]:
-doodle_dates.append(collect_dates())
-doodle_dates.append(collect_dates())
-doodle_dates.append(collect_dates())
-doodle_dates.append(collect_dates(date_start=date(2020,2,20),date_end=date(2020,2,20)))
+#doodle_dates.append(collect_dates())
+#doodle_dates.append(collect_dates())
+#doodle_dates.append(collect_dates())
+#doodle_dates.append(collect_dates(date_start=date(2020,2,20),date_end=date(2020,2,20)))
 
 
 countedDates = poll_date(doodle_dates)
