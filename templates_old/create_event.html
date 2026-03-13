@@ -1,0 +1,74 @@
+{%extends "base.html"%}
+{%block content%}
+
+<h2>New Event</h2>
+
+<form id="create_event_form">
+    <div>
+        <label>Title</label>
+        <input type="text"
+               name="title"
+               id="title"/>
+    </div>
+
+    <div>
+        <label>Description</label>
+        <input type="text"
+               name="description"
+               id="description"/>
+    </div>
+
+    <div>
+        <fieldset>
+            <legend>Location Type:</legend>
+            <label>
+                <input type="radio"
+                       name="location_type"
+                       value="physical"
+                       required
+                       onchange="location_toggle()">
+                On location
+                </input>
+            </label>
+            <label>
+                <input
+                        type="radio"
+                        name="location_type"
+                        value="virtual"
+                        onchange="location_toggle()">
+                Online
+                </input>
+            </label>
+        </fieldset>
+    </div>
+
+    <div>
+        <fieldset>
+            <legend>Doodle or fixed appointment?</legend>
+            <label>
+                <input type="radio"
+                       name="meeting_type"
+                       value="fixed"
+                       required
+                       onchange="meeting_toggle()">
+                Fixed appointment
+                </input>
+            </label>
+            <label>
+                <input
+                        type="radio"
+                        name="meeting_type"
+                        value="doodle"
+                        onchange="meeting_toggle()">
+                Doodle
+                </input>
+            </label>
+        </fieldset>
+    </div>
+    <div>
+        <input type="submit" name="submit" value="Create"></input>
+    </div>
+</form>
+
+
+{%endblock%}
