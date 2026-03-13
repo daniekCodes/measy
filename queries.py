@@ -203,6 +203,11 @@ def get_poll_by_id(id):
         poll = session.get(Poll, id)
         return poll
 
+def get_poll_by_appointment_id(appointment_id):
+    with Session(engine) as session:
+        poll = session.query(Poll).filter(Poll.appointment_id == appointment_id).first()
+        return poll
+
 def update_poll(id, appointment_id=None, description=None):
     with Session(engine) as session:
         poll = session.get(Poll, id)
@@ -229,6 +234,11 @@ def get_choice_by_id(id):
     with Session(engine) as session:
         choice = session.get(Choice, id)
         return choice
+
+def get_choices_by_poll_id(poll_id):
+    with Session(engine) as session:
+        choices = session.query(Choice).filter(Choice.poll_id == poll_id).all()
+        return choices
 
 def update_choice(id, poll_id=None, label=None):
     with Session(engine) as session:
