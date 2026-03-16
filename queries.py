@@ -178,6 +178,12 @@ def get_attendance_by_status(appointment_id, status):
         attendance = session.query(Attendance).filter(Attendance.appointment_id == appointment_id, Attendance.status_attend == status).all()
         return attendance
 
+def get_attendance_by_user(user_id):
+    with Session(engine) as session:
+        attendance = session.query(Attendance).filter(Attendance.user_id == user_id).all()
+        return attendance
+
+
 def update_attendance(id, appointment_id=None, status_attend=None):
     with Session(engine) as session:
         attendance = session.get(Attendance, id)
