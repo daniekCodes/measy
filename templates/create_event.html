@@ -1,0 +1,116 @@
+{%extends "base.html"%}
+{%block content%}
+
+<h2>Neues Event</h2>
+
+<form id="create_event_form"
+      action="/create_event"
+      method="POST">
+    <div>
+        <label for="title">Titel</label>
+        <input type="text"
+               name="title"
+               id="title"/>
+    </div>
+
+    <div>
+        <label for="description">Beschreibung</label>
+        <input type="text"
+               name="description"
+               id="description"/>
+    </div>
+
+    <div>
+        <fieldset>
+            <legend>Vor Ort oder Online?</legend>
+            <label>
+                <input type="radio"
+                       name="location_type"
+                       value="physical"
+                       required
+                       onchange="location_toggle()">
+                Vor Ort
+            </label>
+            <label>
+                <input
+                        type="radio"
+                        name="location_type"
+                        value="virtual"
+                        onchange="location_toggle()">
+                Online
+            </label>
+        </fieldset>
+        <!-- for physical radiobutton -->
+        <div id="physical_placeholder">
+            <input type="text"
+                   name="street"
+                   placeholder="Straße"/>
+            <input type="text"
+                   name="housenumber"
+                   placeholder="Hausnummer">
+            <br>
+            <input type="text"
+                   name="plz"
+                   placeholder="Postleitzahl">
+            <input type="text"
+                   name="city"
+                   placeholder="Stadt">
+        </div>
+        <!-- for online radiobutton -->
+        <div id="online_placeholder">
+            <input type="url"
+                   name="meeting_link"
+                   placeholder="URL zu Meeting">
+        </div>
+    </div>
+
+    <div>
+        <fieldset>
+            <legend>Steht das Datum fest?</legend>
+            <label>
+                <input type="radio"
+                       name="meeting_type"
+                       value="fixed_meeting"
+                       required
+                       onchange="meeting_toggle()">
+                Festes Datum
+            </label>
+            <label>
+                <input
+                        type="radio"
+                        name="meeting_type"
+                        value="doodle"
+                        onchange="meeting_toggle()">
+                Abstimmung
+            </label>
+        </fieldset>
+        <!-- for fixed radiobutton -->
+        <div id="fixed_placeholder">
+            <input type="date" name="fixed_date">
+            <input type="time" name="fixed_time">
+        </div>
+        <!-- for doodle radiobutton -->
+        <div id="doodle_placeholder">
+            <div>
+                <label>Option 1</label>
+                <input type="date" name="option1_date">
+                <input type="time" name="option1_time">
+            </div>
+            <div>
+                <label>Option 2</label>
+                <input type="date" name="option2_date">
+                <input type="time" name="option2_time">
+            </div>
+            <div>
+                <label>Option 3</label>
+                <input type="date" name="option3_date">
+                <input type="time" name="option3_time">
+            </div>
+        </div>
+    </div>
+    <button type="submit">Speichern</button>
+</form>
+
+<script src="{{url_for('static', filename='main.js')}}"></script>
+
+{%endblock%}

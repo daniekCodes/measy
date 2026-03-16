@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>doodle</title>
+</head>
+<body>
+    <h1>Abstimmung</h1>
+    <table>
+        <tr>
+            <th>Datum</th>
+            <th>Abstimmen</th>
+            <th>Stimmen</th>
+        </tr>
+        {% for option in options %}
+        <tr>
+            <td>{{option.date}}</td>
+            <td><button>+</button></td>
+            <td>{{option.count_votes}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

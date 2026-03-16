@@ -6,6 +6,7 @@ Validation for constrained fields (role, meeting_type, status_attend) is handled
 from sqlalchemy.orm import Session
 from database import engine
 from models import User, Appointment, Attendance, Poll, Choice, Vote, Location
+from sqlalchemy import select
 
 
 def create_user(name, email, password, role='user'):
@@ -173,6 +174,11 @@ def get_attendance_by_id(id):
         attendance = session.get(Attendance, id)
         return attendance
 
+def get_attendances_by_user_id(user_id):
+    with Session(engine) as session:
+        attendances = session.query(Attendance).filter(Attendance.user_id == user_id).all()
+        return attendances
+
 def get_attendance_by_status(appointment_id, status):
     with Session(engine) as session:
         attendance = session.query(Attendance).filter(Attendance.appointment_id == appointment_id, Attendance.status_attend == status).all()
@@ -244,6 +250,12 @@ def delete_choice(id):
         choice = session.get(Choice, id)
         session.delete(choice)
         session.commit()
+
+def get_choices_by_poll_id(poll_id):
+    with Session(engine) as session:
+        choices = session.execute(select(Choice).where(Choice.poll_id==poll_id))
+        return choices.scalars().all()
+
 
 def create_vote(user_id, choice_id, can_attend=False):
     # can_attend: True = user can attend at this choice's time, False = cannot
