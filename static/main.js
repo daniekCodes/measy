@@ -24,7 +24,7 @@ function meeting_toggle() {
     // Which radio button is selected
     let choice = document.querySelector('input[name="meeting_type"]:checked').value;
 
-    // FIX: Changed 'physical' to 'fixed_meeting'
+    // Changed 'physical' to 'fixed_meeting'
     if (choice === 'fixed_meeting') {
         fixed.style.display = 'block';
         doodle.style.display = 'none';
