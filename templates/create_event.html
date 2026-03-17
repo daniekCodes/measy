@@ -4,7 +4,7 @@
 <h2>Neues Event</h2>
 
 <form id="create_event_form"
-      action="/create_event"
+      action={{url_for("create_appointment", user_id=user_id)}}
       method="POST">
     <div>
         <label for="title">Titel</label>
@@ -137,6 +137,7 @@
         </div>
         <button type="button">Cancel</button>
         <button type="submit">Speichern</button>
+    </div>
 </form>
 
 

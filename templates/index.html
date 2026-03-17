@@ -2,54 +2,6 @@
 {%block content%}
 
 <div class="main_container">
-    {% if user%}
-    <div class="main_table">
-        <h3>Meine Events</h3>
-        <table>
-            <thead>
-            <tr>
-                <th>Event</th>
-                <th>Datum</th>
-            </tr>
-            </thead>
-            <tbody>
-            {%for event in events%}
-            <tr>
-                <td>{{event.title}}</td>
-                <td>{{event.date}}</td>
-            </tr>
-            {%else%}
-            <tr>
-                <td>Keine Events zugewiesen</td>
-            </tr>
-            {%endfor%}
-            </tbody>
-        </table>
-
-    </div>
-
-    <div class="main_table">
-        <h3>My Invitations</h3>
-        <ul>
-            {%for invitation in invitations%}
-            <li>{{invitation.date}}: {{invitation.title}}</li>
-            {%else%}
-            <li>No Invitations Available</li>
-            {%endfor%}
-        </ul>
-    </div>
-
-    <div class="main_table">
-        <h3>Action needed from my side</h3>
-        <ul>
-            {%for poll in polls%}
-            <li>{{poll.title}}</li>
-            {%else%}
-            <li>You're Up To Date</li>
-            {%endfor%}
-        </ul>
-    </div>
-    {% else %}
     <div>
         <h3>Login</h3>
         <form action={{url_for("create_user")}} method="POST">
@@ -57,6 +9,5 @@
             <input type="submit" value="register">
         </form>
     </div>
-    {%endif%}
 </div>
 {%endblock%}

@@ -6,7 +6,7 @@
     <h1>{{event.title}}</h1>
     <p>Beschreibung: {{event.description}}</p>
 
-    {%if event.location_type == "physical%}
+    {%if event.location_type == "physical"%}
     <p>Ort: {{event.street}} {{event.housenumber}}, {{event.plz}}{{event.city}}</p>
     {%else%}
     <p>Link zur meeting: <a href="{{event.meeting_link}}">Hier klicken</a></p>
@@ -35,5 +35,8 @@
         </tr>
         {% endfor %}
     </table>
+
+{% endif %}
+
 
 {%endblock%}

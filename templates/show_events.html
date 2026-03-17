@@ -7,7 +7,7 @@
 <body>
     <h1>Events</h1>
     {% if user_id %}
-    <a href={{url_for("create_appointment", user_id=request.view_args['user_id'])}}>Neues Event</a>
+    <a href={{url_for("new_appointment", user_id=request.view_args['user_id'])}}>Neues Event</a>
     <table>
         <tr>
             <th>ID</th>

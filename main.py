@@ -19,7 +19,15 @@ def home():
 @app.route("/users/<user_id>", methods=["GET"])
 def user_home(user_id):
     user = queries.get_user_by_id(user_id)
-    return render_template("index.html", user=user)
+    events = []
+    invitations = []
+    for appointment in queries.get_all_appointments():
+        if appointment.user_id == int(user_id):
+            events.append(appointment)
+    for attendance in queries.get_attendances_by_user_id(user_id):
+            appointment = queries.get_appointment_by_id(attendance.appointment_id)
+            invitations.append(appointment)
+    return render_template("home.html", user=user, events=events, invitations=invitations)
 
 @app.route("/users", methods=["POST"])
 def create_user():
@@ -30,8 +38,12 @@ def create_user():
 
 @app.route("/users/<user_id>/appointments", methods=["POST"])
 def create_appointment(user_id):
-    queries.create_appointment("title", user_id, 1)
-    return redirect("/users/<user_id>/appointments", code=302)
+    title = request.form["title"]
+    description = request.form["description"]
+    date_start = datetime.now()
+    queries.create_appointment(title, int(user_id), 1,description,date_start)
+    return redirect(url_for("user_home", user_id=user_id))
+    #redirect(url_for("get_appointments", user_id=user_id))
 
 @app.route("/users/<user_id>/appointments", methods=["GET"])
 def get_appointments(user_id):
@@ -62,11 +74,13 @@ def get_appointment(user_id, appointment_id):
     options = show_doodle(appointment.id)
     return render_template("event_details.html", event=appointment, options=options)
 
-#@app.route('/users/<user_id>/appointments/create', methods=['POST'])
+@app.route('/users/<user_id>/appointments/create', methods=['GET'])
+def new_appointment(user_id):
+    return render_template("create_event.html", user_id=user_id)
 
 
 
-@app.route('/appointments/<appointment_id>/create_doodle', methods=['POST'])
+@app.route('/users/<user_id>/appointments/<appointment_id>/create_doodle', methods=['POST'])
 def create_doodle(appointment_id):
     poll_description = "test poll"   # request.form["poll_description"]
     poll = queries.create_poll(appointment_id, poll_description)
@@ -76,7 +90,7 @@ def create_doodle(appointment_id):
     doodle_dates.append(request.form["date3"])
     for doodle_date in doodle_dates:
         queries.create_choice(poll.id, doodle_date)
-    return redirect("/appointments/<appointment_id>/show_doodle", code=302)
+    return redirect("/users/<user_id>/appointments/<appointment_id>")
 
 def show_doodle(appointment_id):
     options = []
