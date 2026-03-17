@@ -1,11 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>doodle</title>
-</head>
-<body>
-    <h1>Abstimmung</h1>
+{%extends "event_details.html"%}
+{%block doodle%}
+ <h1>Abstimmung</h1>
     <table>
         <tr>
             <th>Datum</th>
@@ -20,5 +15,4 @@
         </tr>
         {% endfor %}
     </table>
-</body>
-</html>
+{%endblock%}

@@ -22,7 +22,7 @@
             <td>{{appointment.title}}</td>
             <td>{{appointment.description}}</td>
             <td>{{appointment.start_time}}</td>
-            <td><a href={{url_for("create_vote",
+            <td><a href={{url_for("get_appointment",
                    user_id=request.view_args['user_id'],
                    appointment_id=appointment.id)}}>Link</a></td>
         </tr>

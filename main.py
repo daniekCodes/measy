@@ -52,9 +52,19 @@ def show_all_appointments():
         appointments.append(appointment)
     return jsonify(appointments)
 
-@app.route('/users/<user_id>/appointments/<appointment_id>', methods=['POST', 'GET'])
-def get_appointment(appointment_id):
-    return str(queries.get_appointment_by_id(appointment_id).id)
+@app.route('/users/<user_id>/appointments/<appointment_id>', methods=['GET'])
+def get_appointment(user_id, appointment_id):
+    appointment = queries.get_appointment_by_id(appointment_id)
+    attendances = queries.get_attendances_by_user_id(appointment_id)
+    for attendance in attendances:
+        if attendance.appointment_id == appointment_id:
+            appointment = attendance
+    options = show_doodle(appointment.id)
+    return render_template("event_details.html", event=appointment, options=options)
+
+#@app.route('/users/<user_id>/appointments/create', methods=['POST'])
+
+
 
 @app.route('/appointments/<appointment_id>/create_doodle', methods=['POST'])
 def create_doodle(appointment_id):
@@ -68,7 +78,6 @@ def create_doodle(appointment_id):
         queries.create_choice(poll.id, doodle_date)
     return redirect("/appointments/<appointment_id>/show_doodle", code=302)
 
-@app.route('/appointments/<appointment_id>/show_doodle', methods=['GET'])
 def show_doodle(appointment_id):
     options = []
     poll_id = queries.get_poll_by_id(appointment_id).id
@@ -77,7 +86,7 @@ def show_doodle(appointment_id):
         votes = queries.get_votes_by_choice(choice.id)
         numVotes = len(votes)
         options.append(DoodleVote(choice.label, numVotes))
-    return render_template("doodle.html", options=options)
+    return options
 
 @app.route('/users/<user_id>/appointments/<appointment_id>/vote', methods=['POST'])
 def create_vote(user_id, appointment_id):
