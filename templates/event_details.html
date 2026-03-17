@@ -2,14 +2,22 @@
 {%block content%}
 
 <div>
+    <!--todo: check if app.py routing matches -->
     <h1>{{event.title}}</h1>
     <p>Beschreibung: {{event.description}}</p>
 
-    {%if event.location_type == "physical"%}
+    {%if event.location_type == "physical%}
     <p>Ort: {{event.street}} {{event.housenumber}}, {{event.plz}}{{event.city}}</p>
     {%else%}
-    <p>Link zur meeting: <a href={{event.meeting_link}}>Hier klicken</a></p>
+    <p>Link zur meeting: <a href="{{event.meeting_link}}">Hier klicken</a></p>
     {%endif%}
+</div>
+
+{% if event.start_datetime%}
+<div>
+    <h2>Festes Datum:</h2>
+    <!--todo: start and end time? -->
+    <h3>{{event.event_datetime}}</h3>
 </div>
 
  <h1>Abstimmung</h1>

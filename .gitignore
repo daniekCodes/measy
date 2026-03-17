@@ -3,7 +3,7 @@ __pycache__/
 *.py[codz]
 *$py.class
 .idea/
-
+app.py
 # C extensions
 *.so
 

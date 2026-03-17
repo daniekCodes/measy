@@ -25,11 +25,16 @@ function meeting_toggle() {
     let choice = document.querySelector('input[name="meeting_type"]:checked').value;
 
     // Changed 'physical' to 'fixed_meeting'
-    if (choice === 'fixed_meeting') {
-        fixed.style.display = 'block';
-        doodle.style.display = 'none';
+    if (choice === "fixed_meeting") {
+        fixed.style.display = "block";
+        doodle.style.display = "none";
+
+    } else if (choice === "doodle") {
+        fixed.style.display = "none";
+        doodle.style.display = "block";
+
     } else {
-        fixed.style.display = 'none';
-        doodle.style.display = 'block';
+        fixed.style.display = "none";
+        doodle.style.display = "none";
     }
 }
