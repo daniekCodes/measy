@@ -76,7 +76,7 @@ def get_appointment(user_id, appointment_id):
 
 @app.route('/users/<user_id>/appointments/create', methods=['GET'])
 def new_appointment(user_id):
-    return render_template("create_event.html", user_id=user_id)
+    return render_template("create_appointment.html", user_id=user_id)
 
 
 
