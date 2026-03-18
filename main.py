@@ -15,7 +15,7 @@ app.url_map.strict_slashes = False
 @app.route("/")
 def home():
     return render_template("index.html")
-
+'''
 @app.route("/users/<user_id>", methods=["GET"])
 def user_home(user_id):
     user = queries.get_user_by_id(user_id)
@@ -28,8 +28,32 @@ def user_home(user_id):
             appointment = queries.get_appointment_by_id(attendance.appointment_id)
             invitations.append(appointment)
     return render_template("home.html", user=user, events=events, invitations=invitations)
+'''
 
-@app.route("/users", methods=["POST"])
+
+@app.route("/users/<user_id>", methods=["GET"])
+def user_home(user_id):
+    # --- Dummy daten---
+
+    dummy_user = {"id": user_id, "name": "Test User"}
+
+    dummy_events = [
+        {"id": 1, "title": "Projekt Meeting", "start_datetime": "20.03.2026 10:00"},
+        {"id": 2, "title": "Team Lunch", "start_datetime": "22.03.2026 12:30"}
+    ]
+
+    dummy_invitations = [
+        {"id": 3, "title": "Kundenpräsentation", "start_datetime": "25.03.2026 14:00"},
+        {"id": 4, "title": "Weihnachtsfeier", "start_datetime": "15.12.2026 18:00"}
+    ]
+
+    return render_template(
+        "home.html",
+        user=dummy_user,
+        events=dummy_events,
+        invitations=dummy_invitations
+    )
+
 def create_user():
     email = request.form["email"]
     queries.create_user("max", email, "")

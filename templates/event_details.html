@@ -1,52 +1,59 @@
 {% extends "base.html" %}
 {% block content %}
+<div class="container py-4">
+    <h2>{{ appointment.title }}</h2>
+    <p class="text-muted">{{ appointment.description }}</p>
+    <hr>
 
-<nav>
-    <h2><a href="{{ url_for('user_home', user_id=user_id) }}">Home</a></h2>
-</nav>
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5>Ort festlegen</h5>
+                    <select class="form-select mb-3" id="location_type">
+                        <option value="none">Bitte wählen...</option>
+                        <option value="physical">Vor Ort (Physisch)</option>
+                        <option value="virtual">Online Meeting</option>
+                    </select>
 
-<div>
-    <h1>{{ event.title }}</h1>
-    <p>Beschreibung: {{ event.description }}</p>
+                    <div id="physical_placeholder" class="border p-3 rounded bg-light">
+                        <input type="text" class="form-control mb-2" placeholder="Straße">
+                        <input type="text" class="form-control mb-2" placeholder="Stadt">
+                    </div>
 
-    {% if event.location_type == "physical" %}
-        <p>Ort: {{ event.street }} {{ event.house_number }}, {{ event.postal_code }} {{ event.city }}</p>
-    {% elif event.location_type == "virtual" %}
-        <p>Link zum Meeting: <a href="{{ event.meeting_link }}">Hier klicken</a></p>
-    {% endif %}
+                    <div id="online_placeholder" class="border p-3 rounded bg-light">
+                        <input type="url" class="form-control" placeholder="Meeting Link (Teams/Zoom)">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5>Zeitpunkt festlegen</h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="timeType" id="fixedRadio">
+                        <label class="form-check-label" for="fixedRadio">Festes Datum</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="timeType" id="doodleRadio">
+                        <label class="form-check-label" for="doodleRadio">Doodle Umfrage</label>
+                    </div>
+
+                    <div id="fixed_placeholder" class="mt-3">
+                        <input type="datetime-local" class="form-control">
+                    </div>
+
+                    <div id="doodle_placeholder" class="mt-3">
+                        <p class="small text-muted">Teilnehmer können über Termine abstimmen.</p>
+                        <button class="btn btn-sm btn-outline-primary">+ Option hinzufügen</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-success w-100">Event finalisieren & Einladungen senden</button>
 </div>
-
-{% if event.start_datetime %}
-<div>
-    <h2>Festes Datum:</h2>
-    <p>
-        <strong>Von:</strong> {{ event.start_datetime }} <br>
-        <strong>Bis:</strong> {{ event.end_datetime }}
-    </p>
-</div>
-{% endif %}
-
-{% if options %}
-<div>
-    <h1>Abstimmung</h1>
-
-    <form action="/users/{{ user_id }}/appointments/{{ event.id }}/vote" method="POST">
-        <table>
-            <tr>
-                <th>Datum</th>
-                <th>Abstimmen</th>
-                <th>Stimmen</th>
-            </tr>
-            {% for option in options %}
-            <tr>
-                <td>{{ option.date }}</td>
-                <td><button type="submit" name="vote_for" value="{{ option.date }}">+</button></td>
-                <td>{{ option.count_votes }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-    </form>
-</div>
-{% endif %}
-
 {% endblock %}
