@@ -7,7 +7,6 @@ from sqlalchemy.orm import Session
 from database import engine
 from models import User, Appointment, Attendance, Poll, Choice, Vote, Location
 
-
 def create_user(name, email, password, role='user'):
     # role: 'user' (default) or 'admin'
     with Session(engine) as session:
