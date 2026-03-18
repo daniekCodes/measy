@@ -40,10 +40,23 @@ def create_user():
 def create_appointment(user_id):
     title = request.form["title"]
     description = request.form["description"]
-    date_start = datetime.now()
-    queries.create_appointment(title, int(user_id), 1,description,date_start)
+    date_start = None
+    date_end = None
+    if "fixed_date" in request.form:
+        date_start = datetime.fromisoformat(f"{request.form["fixed_date"]}T{request.form["fixed_start_time"]}")
+        date_end = datetime.fromisoformat(f"{request.form["fixed_date"]}T{request.form["fixed_end_time"]}")
+
+    queries.create_appointment(title, int(user_id), 1,description,date_start,date_end)
     return redirect(url_for("user_home", user_id=user_id))
-    #redirect(url_for("get_appointments", user_id=user_id))
+
+@app.route("/users/<user_id>/appointments/<appointment_id>", methods=["DELETE"])
+def delete_appointment(user_id, appointment_id):
+    appointment = queries.get_appointment_by_id(appointment_id)
+    if appointment == None:
+        return appointment_id
+    if appointment.user_id == int(user_id):
+        queries.delete_appointment(appointment.id)
+    return redirect(url_for("user_home", user_id=user_id))
 
 @app.route("/users/<user_id>/appointments", methods=["GET"])
 def get_appointments(user_id):
