@@ -1,45 +1,52 @@
-{%extends "base.html"%}
-{%block content%}
+{% extends "base.html" %}
+{% block content %}
+
 <nav>
-    <h2><a href="/">Home</a></h2>
+    <h2><a href="{{ url_for('user_home', user_id=user_id) }}">Home</a></h2>
 </nav>
 
 <div>
-    <!--todo: check if app.py routing matches -->
-    <h1>{{event.title}}</h1>
-    <p>Beschreibung: {{event.description}}</p>
+    <h1>{{ event.title }}</h1>
+    <p>Beschreibung: {{ event.description }}</p>
 
-    {%if event.location_type == "physical"%}
-    <p>Ort: {{event.street}} {{event.housenumber}}, {{event.plz}}{{event.city}}</p>
-    {%else%}
-    <p>Link zur meeting: <a href="{{event.meeting_link}}">Hier klicken</a></p>
-    {%endif%}
+    {% if event.location_type == "physical" %}
+        <p>Ort: {{ event.street }} {{ event.house_number }}, {{ event.postal_code }} {{ event.city }}</p>
+    {% elif event.location_type == "virtual" %}
+        <p>Link zum Meeting: <a href="{{ event.meeting_link }}">Hier klicken</a></p>
+    {% endif %}
 </div>
 
-{% if event.start_datetime%}
+{% if event.start_datetime %}
 <div>
     <h2>Festes Datum:</h2>
-    <!--todo: start and end time? -->
-    <h3>{{event.event_datetime}}</h3>
+    <p>
+        <strong>Von:</strong> {{ event.start_datetime }} <br>
+        <strong>Bis:</strong> {{ event.end_datetime }}
+    </p>
 </div>
-
- <h1>Abstimmung</h1>
-    <table>
-        <tr>
-            <th>Datum</th>
-            <th>Abstimmen</th>
-            <th>Stimmen</th>
-        </tr>
-        {% for option in options %}
-        <tr>
-            <td>{{option.date}}</td>
-            <td><button>+</button></td>
-            <td>{{option.count_votes}}</td>
-        </tr>
-        {% endfor %}
-    </table>
-
 {% endif %}
 
+{% if options %}
+<div>
+    <h1>Abstimmung</h1>
 
-{%endblock%}
+    <form action="/users/{{ user_id }}/appointments/{{ event.id }}/vote" method="POST">
+        <table>
+            <tr>
+                <th>Datum</th>
+                <th>Abstimmen</th>
+                <th>Stimmen</th>
+            </tr>
+            {% for option in options %}
+            <tr>
+                <td>{{ option.date }}</td>
+                <td><button type="submit" name="vote_for" value="{{ option.date }}">+</button></td>
+                <td>{{ option.count_votes }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </form>
+</div>
+{% endif %}
+
+{% endblock %}
