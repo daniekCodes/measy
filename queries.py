@@ -13,6 +13,7 @@ def create_user(name, email, password, role='user'):
         new_user = User(name=name, email=email, password=password, role=role)
         session.add(new_user)
         session.commit()
+        return new_user.id
 
 def get_all_users():
     with Session(engine) as session:
@@ -67,6 +68,7 @@ def create_location(meeting_type, latitude=None, longitude=None, street=None,
                                 city=city, virtual_location=virtual_location)
         session.add(new_location)
         session.commit()
+        return new_location.id
 
 def get_location_by_id(id):
     with Session(engine) as session:
@@ -127,6 +129,7 @@ def create_appointment(title, organiser_id, location_id, description=None, start
         new_appointment = Appointment(title=title, user_id=organiser_id, location_id=location_id, description=description, start_datetime=start_datetime, end_datetime=end_datetime)
         session.add(new_appointment)
         session.commit()
+        return new_appointment.id
 
 def get_all_appointments():
     with Session(engine) as session:
@@ -166,6 +169,7 @@ def create_attendance(user_id, appointment_id, status_attend='invited'):
         new_attendance = Attendance(user_id=user_id, appointment_id=appointment_id, status_attend=status_attend)
         session.add(new_attendance)
         session.commit()
+        return new_attendance.id
 
 def get_attendance_by_id(id):
     with Session(engine) as session:
@@ -181,7 +185,6 @@ def get_attendance_by_user(user_id):
     with Session(engine) as session:
         attendance = session.query(Attendance).filter(Attendance.user_id == user_id).all()
         return attendance
-
 
 def update_attendance(id, appointment_id=None, status_attend=None):
     with Session(engine) as session:
@@ -202,6 +205,7 @@ def create_poll(appointment_id, description):
         new_poll = Poll(appointment_id=appointment_id, description=description)
         session.add(new_poll)
         session.commit()
+        return new_poll.id
 
 def get_poll_by_id(id):
     with Session(engine) as session:
@@ -234,6 +238,7 @@ def create_choice(poll_id, label):
         new_choice = Choice(poll_id=poll_id, label=label)
         session.add(new_choice)
         session.commit()
+        return new_choice.id
 
 def get_choice_by_id(id):
     with Session(engine) as session:
@@ -266,6 +271,7 @@ def create_vote(user_id, choice_id, can_attend=False):
         new_vote = Vote(user_id=user_id, choice_id=choice_id, can_attend=can_attend)
         session.add(new_vote)
         session.commit()
+        return new_vote.id
 
 def get_vote_by_id(id):
     with Session(engine) as session:
