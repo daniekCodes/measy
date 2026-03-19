@@ -2,7 +2,8 @@
 {%block content%}
 
 <div class="main_container">
-    {% if user_id%}
+    {% if user_id %}
+    <a href={{url_for("new_appointment", user_id=user_id)}}>Event erstellen</a>
     <div class="main_table">
         <h3>Meine Events</h3>
         <table>
@@ -10,6 +11,8 @@
             <tr>
                 <th>Event</th>
                 <th>Datum</th>
+                <th>Details</th>
+                <th>Löschen</th>
             </tr>
             </thead>
             <tbody>
@@ -17,6 +20,14 @@
             <tr>
                 <td>{{event.title}}</td>
                 <td>{{event.start_datetime}}</td>
+                <td><a href={{url_for("get_appointment", user_id=user_id, appointment_id=event.id)}}>
+                    Ansehen</a>
+                </td>
+                <td><form action={{url_for("delete_appointment", user_id=user_id,
+                          appointment_id=event.id)}} method="POST">
+                    <button type="submit">X</button>
+                  </form>
+                </td>
             </tr>
             {%else%}
             <tr>
