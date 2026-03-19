@@ -7,7 +7,7 @@ Appointment → Poll → Choice → Vote ← User
 """
 
 from sqlalchemy import Column, Integer, String, CheckConstraint, ForeignKey, DateTime, Float, Boolean
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, relationship
 from dataclasses import dataclass
 from datetime import datetime
 

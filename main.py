@@ -42,12 +42,42 @@ def create_appointment(user_id):
     description = request.form["description"]
     date_start = None
     date_end = None
-    if "fixed_date" in request.form:
+
+    if request.form["fixed_date"]:
         date_start = datetime.fromisoformat(f"{request.form["fixed_date"]}T{request.form["fixed_start_time"]}")
         date_end = datetime.fromisoformat(f"{request.form["fixed_date"]}T{request.form["fixed_end_time"]}")
 
-    queries.create_appointment(title, int(user_id), 1,description,date_start,date_end)
-    return redirect(url_for("user_home", user_id=user_id))
+    location_id = None
+    meeting_type = request.form["location_type"]
+
+    if meeting_type == "physical":
+        location_id = queries.create_location( 
+                meeting_type=meeting_type,
+                street=request.form["street"],
+                house_number=request.form["housenumber"],
+                postal_code = request.form["plz"],
+                city = request.form["city"])
+    else:
+        location_id = queries.create_location(
+               meeting_type=meeting_type,
+               virtual_location = request.form["meeting_link"])
+
+    queries.create_appointment(title, int(user_id), location_id,description,date_start,date_end)
+
+    return render_template("home.html", user_id=user_id)
+
+    # this needs to go seperately
+    # if request.form["option1_date"]:
+    #     # create doodle
+    #     options = []
+    #     for i in range(1,4):
+    #         option_date = request.form[f"option{i}_date"]
+    #         option_start_time = request.form[f"option{i}_start"]
+    #         option_end_time = request.form[f"option{i}_end"]
+
+    # queries.create_poll()
+
+    # return redirect(url_for("user_home", user_id=user_id))
 
 @app.route("/users/<user_id>/appointments/<appointment_id>", methods=["DELETE"])
 def delete_appointment(user_id, appointment_id):
@@ -72,10 +102,10 @@ def get_appointments(user_id):
 
 @app.route("/appointments/showall", methods=["GET"])
 def show_all_appointments():
-    appointments = []
+    strr = ""
     for appointment in queries.get_all_appointments():
         appointments.append(appointment)
-    return jsonify(appointments)
+    return appointments
 
 @app.route('/users/<user_id>/appointments/<appointment_id>', methods=['GET'])
 def get_appointment(user_id, appointment_id):
@@ -107,12 +137,14 @@ def create_doodle(appointment_id):
 
 def show_doodle(appointment_id):
     options = []
-    poll_id = queries.get_poll_by_id(appointment_id).id
-    choices = queries.get_choices_by_poll_id(poll_id)
-    for choice in choices:
-        votes = queries.get_votes_by_choice(choice.id)
-        numVotes = len(votes)
-        options.append(DoodleVote(choice.label, numVotes))
+    # no poll created 
+    poll = queries.get_poll_by_id(appointment_id)
+    if poll:
+        choices = queries.get_choices_by_poll_id(poll.id)
+        for choice in choices:
+            votes = queries.get_votes_by_choice(choice.id)
+            numVotes = len(votes)
+            options.append(DoodleVote(choice.label, numVotes))
     return options
 
 @app.route('/users/<user_id>/appointments/<appointment_id>/vote', methods=['POST'])
