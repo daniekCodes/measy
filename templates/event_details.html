@@ -16,29 +16,40 @@
 
                     <p class="mb-1 text-muted">
                         <strong>Organisator:</strong> {{ appointment.organizer | default('Unbekannt') }}</p>
-                    <p class="mb-0 text-muted">
+                    <p class="mb-2 text-muted">
                         <strong>Ort:</strong> {{ location | default('Kein Ort angegeben') }}</p>
+
+                    {% if attendance_status %}
+                        <div class="mt-3 pt-3 border-top">
+                            <span class="text-muted small">Dein aktueller Status:</span>
+                            <span class="badge {% if 'Nehme teil' in attendance_status %}bg-success{% else %}bg-secondary{% endif %} ms-1">
+                                {{ attendance_status }}
+                            </span>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
 
             <div class="card shadow-sm mb-4">
                 <div class="card-body p-4">
-
                     <form action="{{ url_for('create_vote', user_id=user_id, appointment_id=appointment.id) }}" method="POST">
 
                         {% if poll %}
                             <h5 class="mb-4">Abstimmungsoptionen</h5>
 
-                            {% for choice in choices %} <div class="d-flex justify-content-between align-items-center mb-3 p-2 border rounded">
+                            {% for choice in choices %}
+                                <div class="d-flex justify-content-between align-items-center mb-3 p-2 border rounded">
                                     <span class="fw-bold">{{ choice.date }}</span>
 
                                     <div class="btn-group" role="group">
                                         <input type="radio" class="btn-check" name="choice_{{ choice.id }}"
-                                               id="yes_{{ choice.id }}" value="yes" autocomplete="off">
+                                               id="yes_{{ choice.id }}" value="yes" autocomplete="off"
+                                               {% if choice.user_voted_yes %}checked{% endif %}>
                                         <label class="btn btn-outline-success" for="yes_{{ choice.id }}">Nehme teil</label>
 
                                         <input type="radio" class="btn-check" name="choice_{{ choice.id }}"
-                                               id="no_{{ choice.id }}" value="no" autocomplete="off" checked>
+                                               id="no_{{ choice.id }}" value="no" autocomplete="off"
+                                               {% if not choice.user_voted_yes %}checked{% endif %}>
                                         <label class="btn btn-outline-secondary" for="no_{{ choice.id }}">Nehme nicht teil</label>
                                     </div>
                                 </div>
@@ -53,31 +64,30 @@
                             </div>
 
                         {% elif appointment.date_start %}
-                            <h5 class="mb-4">Termin</h5>
+                            <h5 class="mb-4">Teilnahme bestätigen</h5>
 
                             <div class="d-flex justify-content-between align-items-center p-2 border rounded mb-3">
-                                <span class="fw-bold">{{ appointment.date_start.strftime('%d.%m.%Y, %H:%M') if appointment.date_start }}</span>
+                                <span class="fw-bold">{{ appointment.date_start.strftime('%d.%m.%Y, %H:%M') }}</span>
 
                                 <div class="btn-group" role="group">
                                     <input type="radio" class="btn-check" name="vote_fixed" id="yes_fixed" value="yes"
-                                           autocomplete="off">
+                                           autocomplete="off" {% if attendance_status == 'Nehme teil' %}checked{% endif %}>
                                     <label class="btn btn-outline-success" for="yes_fixed">Nehme teil</label>
 
                                     <input type="radio" class="btn-check" name="vote_fixed" id="no_fixed" value="no"
-                                           autocomplete="off" checked>
+                                           autocomplete="off" {% if attendance_status != 'Nehme teil' %}checked{% endif %}>
                                     <label class="btn btn-outline-secondary" for="no_fixed">Nehme nicht teil</label>
                                 </div>
                             </div>
 
                             <div class="text-end mt-4">
-                                <button type="submit" class="btn btn-primary fw-bold px-4">Abstimmen</button>
+                                <button type="submit" class="btn btn-primary fw-bold px-4">Speichern</button>
                             </div>
 
                         {% else %}
-                            <p class="text-muted mb-0">Noch keine Termine zur Abstimmung festgelegt.</p>
+                            <p class="text-muted mb-0 italic">Noch keine Termine zur Abstimmung festgelegt.</p>
                         {% endif %}
                     </form>
-
                 </div>
             </div>
 

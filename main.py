@@ -12,7 +12,7 @@ MOCK_DB = {
             "id": 1,
             "title": "Leeres Event",
             "description": "Dieses Event hat noch keine Termine.",
-            "organizer": "Daniek Schuiling",
+            "organizer": "Test User",
             "date_start": None # Chris's date field
         },
         "location": "Büro A, Etage 2",
@@ -58,6 +58,12 @@ MOCK_DB = {
 @app.route("/")
 def home():
     return render_template("index.html")
+# --- LOGIN ROUTE (Needed for index.html) ---
+@app.route("/users", methods=["POST"])
+def create_user():
+    """Handles the login form from index.html and redirects to the dashboard."""
+    # For the mockup, we just redirect everyone to User 1 (Daniek)
+    return redirect(url_for("user_home", user_id=1))
 
 # --- DASHBOARD ---
 @app.route("/users/<user_id>", methods=["GET"])
@@ -96,7 +102,7 @@ def date_fix(user_id, appointment_id):
         total_invited=5
     )
 
-# --- SUPPORTING ROUTES ---
+
 @app.route('/users/<user_id>/appointments/create', methods=['GET'])
 def new_appointment(user_id):
     return render_template("create_event.html", user_id=user_id)
