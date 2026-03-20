@@ -1,13 +1,18 @@
-
+/* Apply the Google Font to everything */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: #f8f9fa;
 }
 
 #physical_placeholder,
 #online_placeholder,
 #fixed_placeholder,
 #doodle_placeholder {
-    display: none;
+display: none;
 }

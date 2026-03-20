@@ -1,42 +1,90 @@
-{%extends "base.html"%}
-{%block content%}
+{% extends "base.html" %}
 
-<div>
-    <!--todo: check if app.py routing matches -->
-    <h1>{{event.title}}</h1>
-    <p>Beschreibung: {{event.description}}</p>
+{% block content %}
+    <div class="row justify-content-center mt-4 mb-5">
+        <div class="col-md-8">
 
-    {%if event.location_type == "physical"%}
-    <p>Ort: {{event.street}} {{event.housenumber}}, {{event.plz}}{{event.city}}</p>
-    {%else%}
-    <p>Link zur meeting: <a href="{{event.meeting_link}}">Hier klicken</a></p>
-    {%endif%}
-</div>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>{{ event.title | default('Event Details') }}</h2>
+                <a href="{{ url_for('user_home', user_id=user_id) }}"
+                   class="btn btn-outline-secondary btn-sm">Abbrechen</a>
+            </div>
 
-{% if event.start_datetime%}
-<div>
-    <h2>Festes Datum:</h2>
-    <!--todo: start and end time? -->
-    <h3>{{event.event_datetime}}</h3>
-</div>
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <p class="mb-4">{{ event.description | default('Keine Beschreibung vorhanden.') }}</p>
 
- <h1>Abstimmung</h1>
-    <table>
-        <tr>
-            <th>Datum</th>
-            <th>Abstimmen</th>
-            <th>Stimmen</th>
-        </tr>
-        {% for option in options %}
-        <tr>
-            <td>{{option.date}}</td>
-            <td><button>+</button></td>
-            <td>{{option.count_votes}}</td>
-        </tr>
-        {% endfor %}
-    </table>
+                    <p class="mb-1 text-muted">
+                        <strong>Organisator:</strong> {{ organizer.name | default('Unbekannt') }}</p>
+                    <p class="mb-0 text-muted">
+                        <strong>Ort:</strong> {{ location.meeting_type | default('Kein Ort angegeben') }}</p>
+                </div>
+            </div>
 
-{% endif %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <form action="{{ url_for('create_vote', user_id=user_id, appointment_id=event.id) }}" method="POST">
 
+                        {% if poll %}
+                            <h5 class="mb-4">Abstimmungsoptionen</h5>
 
-{%endblock%}
+                            {% for choice in choices %}
+                                <div class="d-flex justify-content-between align-items-center mb-3 p-2 border rounded">
+                                    <span class="fw-bold">{{ choice.date }}</span>
+
+                                    <div class="btn-group" role="group">
+                                        <input type="radio" class="btn-check" name="choice_{{ choice.id }}"
+                                               id="yes_{{ choice.id }}" value="yes" autocomplete="off"
+                                               {% if choice.user_voted_yes %}checked{% endif %}>
+                                        <label class="btn btn-outline-success" for="yes_{{ choice.id }}">Nehme teil</label>
+
+                                        <input type="radio" class="btn-check" name="choice_{{ choice.id }}"
+                                               id="no_{{ choice.id }}" value="no" autocomplete="off"
+                                               {% if not choice.user_voted_yes %}checked{% endif %}>
+                                        <label class="btn btn-outline-secondary" for="no_{{ choice.id }}">Nehme nicht teil</label>
+                                    </div>
+                                </div>
+                            {% endfor %}
+
+                            <div class="d-flex justify-content-end gap-2 mt-4">
+                                <a href="{{ url_for('date_fix', user_id=user_id, appointment_id=event.id) }}"
+                                   class="btn btn-outline-secondary fw-bold px-4">Ergebnisse anzeigen</a>
+                                <button type="submit" class="btn btn-primary fw-bold px-4">Abstimmen</button>
+                            </div>
+
+                        {% elif event.date_start %}
+                            <h5 class="mb-4">Teilnahme bestätigen</h5>
+
+                            <div class="d-flex justify-content-between align-items-center p-2 border rounded mb-3">
+                                <span class="fw-bold">{{ event.date_start.strftime('%d.%m.%Y, %H:%M') }}</span>
+
+                                <div class="btn-group" role="group">
+                                    <input type="radio" class="btn-check" name="vote_fixed" id="yes_fixed" value="yes"
+                                           autocomplete="off" {% if attendance_status == 'Nehme teil' %}checked{% endif %}>
+                                    <label class="btn btn-outline-success" for="yes_fixed">Nehme teil</label>
+
+                                    <input type="radio" class="btn-check" name="vote_fixed" id="no_fixed" value="no"
+                                           autocomplete="off" {% if attendance_status != 'Nehme teil' %}checked{% endif %}>
+                                    <label class="btn btn-outline-secondary" for="no_fixed">Nehme nicht teil</label>
+                                </div>
+                            </div>
+
+                            <div class="text-end mt-4">
+                                <button type="submit" class="btn btn-primary fw-bold px-4">Speichern</button>
+                            </div>
+
+                        {% else %}
+                            <p class="text-muted mb-0 italic">Noch keine Termine zur Abstimmung festgelegt.</p>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-center mt-5">
+                <a href="{{ url_for('edit_appointment', user_id=user_id, appointment_id=event.id) }}"
+                   class="btn btn-secondary px-5">Bearbeiten</a>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

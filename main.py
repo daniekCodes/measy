@@ -27,7 +27,7 @@ def user_home(user_id):
     for attendance in queries.get_attendances_by_user_id(user_id):
             att_appointment = queries.get_appointment_by_id(attendance.appointment_id)
             invitations.append(att_appointment)
-    return render_template("home.html", user_id=user_id, events=events, invitations=invitations)
+    return render_template("home.html", user={"id": user_id}, events=events, invitations=invitations)
 
 @app.route("/users", methods=["POST"])
 def create_user():
@@ -48,6 +48,9 @@ def get_all_users():
 
 @app.route("/users/<user_id>/appointments", methods=["POST"])
 def create_appointment(user_id):
+    user = queries.get_user_by_id(user_id)
+    if not user:
+        return render_template("home")
     title = request.form["title"]
     description = request.form["description"]
     date_start = None
@@ -103,7 +106,8 @@ def create_appointment(user_id):
                 attending_user_id = queries.create_user("", attending_user_email, "")
             queries.create_attendance(attending_user_id, appointment_id)
 
-    return redirect(url_for("user_home", user_id=user_id))
+    return redirect(url_for("user_home", 
+            user={"id": user.id, "name": user.name}))
 
 @app.get("/users/<user_id>/attendances")
 def get_attendances_for_user(user_id):
@@ -113,7 +117,7 @@ def get_attendances_for_user(user_id):
         test_str += f"[APP:{attendance.appointment_id} - {attendance.status_attend}] ### "
     return test_str
 
-@app.get("/users/<user_id>/appointments/<appointment_id>")
+@app.get("/users/<user_id>/appointments/<appointment_id>/details")
 def appointment_details(user_id, appointment_id):
     appointment = queries.get_appointment_by_id(appointment_id)
     location = queries.get_location_by_id(appointment.location_id)
@@ -155,16 +159,39 @@ def delete_appointment(user_id, appointment_id):
 @app.route('/users/<user_id>/appointments/<appointment_id>', methods=['GET'])
 def get_appointment(user_id, appointment_id):
     appointment = queries.get_appointment_by_id(appointment_id)
+    user = queries.get_user_by_id(user_id)
+    if not appointment or not user:
+        return redirect(url_for("home"))
+    organizer = queries.get_user_by_id(appointment.id)
     attendances = queries.get_attendances_by_user_id(appointment_id)
     for attendance in attendances:
         if attendance.appointment_id == appointment_id:
             appointment = attendance
     options = show_doodle(appointment.id)
-    return render_template("event_details.html", event=appointment, options=options)
+    location = queries.get_location_by_id(appointment.location_id)
+    return render_template("event_details.html", 
+                           user={"id": user.id, "name": user.name},
+                           event=appointment, 
+                           options=options, 
+                           location=location,
+                           organizer={"name": organizer.name})
+
+@app.get("/users/<user_id>/appointments/<appointment_id>/edit")
+def edit_appointment(user_id, appointment_id):
+    user = queries.get_user_by_id(user_id)
+    appointment = queries.get_appointment_by_id(appointment_id)
+    if not user or not appointment:
+        return render_template("home")
+    return render_template("edit_appointment.html", 
+                           user={"id": user.id, "name": user.name},
+                           appointment=appointment)
 
 @app.route('/users/<user_id>/appointments/create', methods=['GET'])
 def new_appointment(user_id):
-    return render_template("create_event.html", user_id=user_id)
+    user = queries.get_user_by_id(user_id)
+    if not user:
+        return render_template(url_for("home"))
+    return render_template("create_event.html", user={"id": user.id})
 
 @app.get("/users/<user_id>/appointments/<appointment_id>/Date-fix")
 def get_fix_date(user_id, appointment_id):

@@ -1,69 +1,98 @@
-{%extends "base.html"%}
-{%block content%}
+{% extends "base.html" %}
+{% block content %}
 
-<div class="main_container">
-    {% if user_id %}
-    <a href={{url_for("new_appointment", user_id=user_id)}}>Event erstellen</a>
-    <div class="main_table">
-        <h3>Meine Events</h3>
-        <table>
-            <thead>
-            <tr>
-                <th>Event</th>
-                <th>Datum</th>
-                <th>Details</th>
-                <th>Löschen</th>
-            </tr>
-            </thead>
-            <tbody>
-            {%for event in events%}
-            <tr>
-                <td>{{event.title}}</td>
-                <td>{{event.start_datetime}}</td>
-                <td><a href={{url_for("get_appointment", user_id=user_id, appointment_id=event.id)}}>
-                    Ansehen</a>
-                </td>
-                <td><form action={{url_for("delete_appointment", user_id=user_id,
-                          appointment_id=event.id)}} method="POST">
-                    <button type="submit">X</button>
-                  </form>
-                </td>
-            </tr>
-            {%else%}
-            <tr>
-                <td>Keine Events zugewiesen</td>
-            </tr>
-            {%endfor%}
-            </tbody>
-        </table>
+<div class="container py-4">
+    {% if user %}
 
+    <h2 class="mb-4">Willkommen!</h2>
+
+    <div class="card shadow-sm mb-5">
+        <div class="card-header bg-white">
+            <h5 class="m-0">Meine Events</h5> </div>
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Event</th>
+                        <th>Datum</th>
+                        <th class="text-end">Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                    <tr>
+                        <td class="fw-bold">{{ event.title }}</td>
+
+                        <td class="text-muted">
+                            {% if event.date_start %}
+                                {{ event.date_start.strftime('%d.%m.%Y %H:%M') }}
+                            {% elif sth != None %}
+                                Abstimmung läuft
+                            {% else %}
+                                Noch festzulegen
+                            {% endif %}
+                        </td>
+
+                        <td class="text-end">
+                            <a href="{{ url_for('get_appointment', user_id=user.id, appointment_id=event.id) }}"
+                               class="btn btn-sm btn-outline-dark">Ansehen</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" class="text-center py-4 text-muted">Du hast noch keine Events erstellt.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <div class="main_table">
-        <h3>My Invitations</h3>
-        <ul>
-            {%for invitation in invitations%}
-            <li>{{invitation.date}}: {{invitation.title}}</li>
-            {%else%}
-            <li>No Invitations Available</li>
-            {%endfor%}
-        </ul>
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h5 class="m-0">Meine Einladungen</h5> </div>
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Event</th>
+                        <th>Datum</th>
+                        <th class="text-end">Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for invitation in invitations %}
+                    <tr>
+                        <td class="fw-bold">{{ invitation.title }}</td>
+                        <td class="text-muted">
+                            {% if invitation.date_start %}
+                                {{ invitation.date_start.strftime('%d.%m.%Y %H:%M') }}
+                            {% elif sth != None %}
+                                Abstimmung läuft
+                            {% else %}
+                                Noch festzulegen
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <a href="{{ url_for('get_appointment', user_id=user.id, appointment_id=invitation.id) }}"
+                               class="btn btn-sm btn-outline-dark">Ansehen</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" class="text-center py-4 text-muted">Keine Einladungen</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <div class="main_table">
-        <h3>Action needed from my side</h3>
-        <ul>
-            {%for poll in polls%}
-            <li>{{poll.title}}</li>
-            {%else%}
-            <li>You're Up To Date</li>
-            {%endfor%}
-        </ul>
-    </div>
     {% else %}
-    <div>
+    <div class="alert alert-warning mt-5">
         <h3>Dieser User existiert nicht.</h3>
     </div>
-    {%endif%}
+    {% endif %}
 </div>
-{%endblock%}
+
+{% endblock %}

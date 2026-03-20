@@ -1,144 +1,109 @@
-{%extends "base.html"%}
-{%block content%}
+{% extends "base.html" %}
 
-<h2>Neues Event</h2>
+{% block content %}
+<div class="row justify-content-center mt-4 mb-5">
+    <div class="col-md-8">
 
-<form id="create_event_form"
-      action={{url_for("create_appointment", user_id=user_id)}}
-      method="POST">
-    <div>
-        <label for="title">Titel</label>
-        <input type="text"
-               name="title"
-               id="title"/>
-    </div>
-
-    <div>
-        <label for="description">Beschreibung</label>
-        <input type="text"
-               name="description"
-               id="description"/>
-    </div>
-
-    <div>
-        <fieldset>
-            <legend>Vor Ort oder Online?</legend>
-            <label>
-                <input type="radio"
-                       name="location_type"
-                       value="physical"
-                       required
-                       onchange="location_toggle()">
-                Vor Ort
-            </label>
-            <label>
-                <input
-                        type="radio"
-                        name="location_type"
-                        value="virtual"
-                        onchange="location_toggle()">
-                Online
-            </label>
-        </fieldset>
-        <!-- for physical radiobutton -->
-        <div id="physical_placeholder">
-            <input type="text"
-                   name="street"
-                   placeholder="Straße"/>
-            <input type="text"
-                   name="housenumber"
-                   placeholder="Hausnummer">
-            <br>
-            <input type="text"
-                   name="plz"
-                   placeholder="Postleitzahl">
-            <input type="text"
-                   name="city"
-                   placeholder="Stadt">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Neuer Event</h2>
+            <a href="{{ url_for('user_home', user_id=user_id) }}" class="btn btn-outline-secondary btn-sm">Abbrechen</a>
         </div>
-        <!-- for online radiobutton -->
-        <div id="online_placeholder">
-            <input type="url"
-                   name="meeting_link"
-                   placeholder="URL zu Meeting">
-        </div>
-    </div>
 
-    <div>
-        <fieldset>
-            <legend>Steht das Datum fest?</legend>
-            <label>
-                <input type="radio"
-                       name="meeting_type"
-                       value="fixed_meeting"
-                       required
-                       onchange="meeting_toggle()">
-                Festes Datum
-            </label>
-            <label>
-                <input
-                        type="radio"
-                        name="meeting_type"
-                        value="doodle"
-                        onchange="meeting_toggle()">
-                Abstimmung
-            </label>
-            <label>
-                <input
-                    type="radio"
-                    name="meeting_type"
-                    value="decide_later"
-                    onchange="meeting_toggle()">
-                Später Datum hinzufugen
-            </label>
-        </fieldset>
-        <!-- for fixed radiobutton -->
-        <div id="fixed_placeholder">
-            <input type="date" name="fixed_date">
-            <label>Von:</label>
-            <input type="time" name="fixed_start_time">
-            <label>Bis:</label>
-            <input type="time" name="fixed_end_time">
-        </div>
-        <!-- for doodle radiobutton -->
-        <div id="doodle_placeholder">
-            <p>Abstimmungsoptionen</p>
-            <div>
-                <label>Option 1:</label>
-                <input type="date" name="option1_date">
-                <label>Von:</label>
-                <input type="time" name="option1_start">
-                <label>Bis:</label>
-                <input type="time" name="option1_end">
-            </div>
-            <div>
-                <label>Option 2:</label>
-                <input type="date" name="option2_date">
-                <label>Von:</label>
-                <input type="time" name="option2_start">
-                <label>Bis:</label>
-                <input type="time" name="option2_end">
-            </div>
-            <div>
-                <label>Option 3:</label>
-                <input type="date" name="option3_date">
-                <label>Von:</label>
-                <input type="time" name="option3_start">
-                <label>Bis:</label>
-                <input type="time" name="option3_end">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+
+                <form action="{{ url_for('create_appointment', user_id=user_id) }}" method="POST">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Event Name</label>
+                        <input type="text" name="title" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Beschreibung</label>
+                        <textarea name="description" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Teilnehmer einladen</label>
+                        <input type="text" name="invite_emails" class="form-control">
+                        <small class="text-muted">E-Mails mit Leerzeichen trennen.</small>
+                    </div>
+
+                    <hr class="mb-4">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold d-block">Ort</label>
+                        <input type="radio" name="location_type" id="loc_physical" value="physical" onchange="location_toggle()" checked>
+                        <label for="loc_physical" class="me-3">Vor Ort</label>
+
+                        <input type="radio" name="location_type" id="loc_online" value="online" onchange="location_toggle()">
+                        <label for="loc_online">Online</label>
+                    </div>
+
+                    <div id="physical_placeholder" class="mb-4" style="display: block;">
+                        <div class="row g-2 mb-2">
+                            <div class="col-md-8">
+                                <label class="form-label">Straße</label>
+                                <input type="text" name="street" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Hausnummer</label>
+                                <input type="text" name="housenumber" class="form-control">
+                            </div>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <label class="form-label">PLZ</label>
+                                <input type="text" name="plz" class="form-control">
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label">Ort</label>
+                                <input type="text" name="city" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="online_placeholder" class="mb-4" style="display: none;">
+                        <label class="form-label">Meeting-Link</label>
+                        <input type="url" name="meeting_link" class="form-control">
+                    </div>
+
+                    <hr class="mb-4">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold d-block">Datum</label>
+                        <input type="radio" name="meeting_type" id="meet_fixed" value="fixed_meeting" onchange="meeting_toggle()">
+                        <label for="meet_fixed" class="me-3">Festes Datum</label>
+
+                        <input type="radio" name="meeting_type" id="meet_doodle" value="doodle_meeting" onchange="meeting_toggle()" checked>
+                        <label for="meet_doodle">Abstimmung</label>
+                    </div>
+
+                    <div id="fixed_placeholder" class="mb-4" style="display: none;">
+                        <div class="row g-2">
+                            <div class="col-md-4"><label class="form-label">Datum</label><input type="date" name="fixed_date" class="form-control"></div>
+                            <div class="col-md-4"><label class="form-label">Start</label><input type="time" name="fixed_start_time" class="form-control"></div>
+                            <div class="col-md-4"><label class="form-label">Ende</label><input type="time" name="fixed_end_time" class="form-control"></div>
+                        </div>
+                    </div>
+
+                    <div id="doodle_placeholder" class="mb-4" style="display: block;">
+                        <label class="form-label fw-bold">Optionen für die Abstimmung</label>
+                        {% for i in range(1, 4) %}
+                        <div class="row g-2 mb-2">
+                            <div class="col-md-4"><input type="date" name="option{{i}}_date" class="form-control"></div>
+                            <div class="col-md-4"><input type="time" name="option{{i}}_start" class="form-control"></div>
+                            <div class="col-md-4"><input type="time" name="option{{i}}_end" class="form-control"></div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 fw-bold">Speichern</button>
+                </form>
             </div>
         </div>
-        <div>
-            <label for="invites">Personen einladen:</label>
-            <br>
-            <textarea name="invite_emails"
-                      id="invites"
-                      placeholder="max@beispiel.de, anna@beispiel.de"></textarea>
-        </div>
-        <button type="button">Cancel</button>
-        <button type="submit">Speichern</button>
+
     </div>
-</form>
-
-
-{%endblock%}
+</div>
+{% endblock %}
