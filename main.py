@@ -25,16 +25,18 @@ def user_home(user_id):
         if appointment.user_id == int(user_id):
             events.append(appointment)
     for attendance in queries.get_attendances_by_user_id(user_id):
-            appointment = queries.get_appointment_by_id(attendance.appointment_id)
-            invitations.append(appointment)
+            att_appointment = queries.get_appointment_by_id(attendance.appointment_id)
+            invitations.append(att_appointment)
     return render_template("home.html", user_id=user_id, events=events, invitations=invitations)
 
 @app.route("/users", methods=["POST"])
 def create_user():
     email = request.form["email"]
-    queries.create_user("max", email, "")
+    name = request.form["name"]
+    password = request.form["password"]
+    queries.create_user(name, email, password)
     user = queries.get_user_by_email(email)
-    return redirect(url_for("get_appointments", user_id=user.id))
+    return redirect(url_for("user_home", user_id=user.id))
 
 @app.get("/users")
 def get_all_users():
@@ -87,15 +89,59 @@ def create_appointment(user_id):
             option_end_time = request.form[f"option{i}_end"]
             queries.create_choice(poll_id, f"{option_date}T{option_start_time} - {option_date}T{option_end_time}") 
 
-    for user_email in request.form["invite_emails"].split(" "):
-        attending_user = queries.get_user_by_email(user_email)
-        attending_user_id = None if not attending_user else attending_user.id
-        if not attending_user_id:
-            user_id = queries.create_user("", user_email, "")
-        queries.create_attendance(attending_user_id, appointment_id)
+    # create attendance for organizer
+    queries.create_attendance(user_id, appointment_id)
+
+    # create attendance for all invited users 
+    # and create an account for all emails that are not in 
+    # db
+    if request.form["invite_emails"]:
+        for attending_user_email in request.form["invite_emails"].split(" "):
+            attending_user = queries.get_user_by_email(attending_user_email)
+            attending_user_id = None if not attending_user else attending_user.id
+            if not attending_user_id:
+                attending_user_id = queries.create_user("", attending_user_email, "")
+            queries.create_attendance(attending_user_id, appointment_id)
 
     return redirect(url_for("user_home", user_id=user_id))
 
+@app.get("/users/<user_id>/attendances")
+def get_attendances_for_user(user_id):
+    attendances = queries.get_attendances_by_user_id(user_id)
+    test_str = ""
+    for attendance in attendances:
+        test_str += f"[APP:{attendance.appointment_id} - {attendance.status_attend}] ### "
+    return test_str
+
+@app.get("/users/<user_id>/appointments/<appointment_id>")
+def appointment_details(user_id, appointment_id):
+    appointment = queries.get_appointment_by_id(appointment_id)
+    location = queries.get_location_by_id(appointment.location_id)
+    poll = queries.get_poll_by_appointment_id(appointment_id)
+    user_attendances = queries.get_attendance_by_user(user_id)
+    attendance_status = None
+    for user_attendance in user_attendances:
+        if user_attendance.appointment_id == appointment_id:
+            attendance_status = user_attendance.status_attend
+            break
+    choices = []
+    if poll:
+        choices = queries.get_choices_by_poll_id(poll.id)
+    votes = []
+    for choice in choices:
+        all_votes = queries.get_votes_by_choice(choice.id)
+        for vote in all_votes:
+            if vote.user_id == user_id:
+                votes.append(vote)
+
+    return render_template("event-details.html",
+                           user_id = user_id,
+                           appointment = appointment,
+                           location = location,
+                           poll = poll,
+                           attendance_status = attendance_status,
+                           choices = choices,
+                           votes = votes)
 
 @app.route("/users/<user_id>/appointments/<appointment_id>", methods=["POST"])
 def delete_appointment(user_id, appointment_id):
@@ -105,25 +151,6 @@ def delete_appointment(user_id, appointment_id):
     if appointment.user_id == int(user_id):
         queries.delete_appointment(appointment.id)
     return redirect(url_for("user_home", user_id=user_id))
-
-@app.route("/users/<user_id>/appointments", methods=["GET"])
-def get_appointments(user_id):
-    appointments = []
-    for appointment in queries.get_all_appointments():
-        if appointment.user_id == int(user_id):
-            appointments.append(appointment)
-    for attendance in queries.get_attendances_by_user_id(user_id):
-            appointment = queries.get_appointment_by_id(attendance.appointment_id)
-            if appointment not in appointments:
-                appointments.append(appointment)
-    return render_template("show_events.html", user_id=user_id, appointments=appointments)
-
-@app.route("/appointments/showall", methods=["GET"])
-def show_all_appointments():
-    strr = ""
-    for appointment in queries.get_all_appointments():
-        appointments.append(appointment)
-    return appointments
 
 @app.route('/users/<user_id>/appointments/<appointment_id>', methods=['GET'])
 def get_appointment(user_id, appointment_id):
@@ -139,17 +166,22 @@ def get_appointment(user_id, appointment_id):
 def new_appointment(user_id):
     return render_template("create_event.html", user_id=user_id)
 
-@app.route('/users/<user_id>/appointments/<appointment_id>/create_doodle', methods=['POST'])
-def create_doodle(appointment_id):
-    poll_description = "test poll"   # request.form["poll_description"]
-    poll = queries.create_poll(appointment_id, poll_description)
-    doodle_dates = []
-    doodle_dates.append(request.form["date1"])
-    doodle_dates.append(request.form["date2"])
-    doodle_dates.append(request.form["date3"])
-    for doodle_date in doodle_dates:
-        queries.create_choice(poll.id, doodle_date)
-    return redirect("/users/<user_id>/appointments/<appointment_id>")
+@app.get("/users/<user_id>/appointments/<appointment_id>/Date-fix")
+def get_fix_date(user_id, appointment_id):
+    appointment = queries.get_appointment_by_id(appointment_id)
+    if not appointment:
+        return render_template("Date-fix.html")
+    if user_id != appointment.user_id:
+        return render_template("Date-fix.html")
+    poll = queries.get_poll_by_appointment_id(appointment_id)
+    if not poll:
+        return render_template("Date-fix.html")
+    choices = queries.get_choices_by_poll_id(poll.id)
+     
+    attendances = queries.get_attendances_by_appointment_id(appointment_id)
+    num_user_invited = len(attendances)
+    voted_options = []
+    return 
 
 def show_doodle(appointment_id):
     options = []

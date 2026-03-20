@@ -182,6 +182,11 @@ def get_attendances_by_user_id(user_id):
         attendances = session.query(Attendance).filter(Attendance.user_id == user_id).all()
         return attendances
 
+def get_attendances_by_appointment_id(appointment_id):
+    with Session(engine) as session:
+        attendances = session.query(Attendance).filter(Attendance.appointment_id == appointment_id).all()
+        return attendances
+
 def get_attendance_by_status(appointment_id, status):
     with Session(engine) as session:
         attendance = session.query(Attendance).filter(Attendance.appointment_id == appointment_id, Attendance.status_attend == status).all()
