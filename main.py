@@ -1,142 +1,124 @@
 from datetime import datetime
 from flask import Flask, redirect, render_template, request, jsonify, url_for
-import queries
-from dataclasses import dataclass
-
-
-@dataclass
-class DoodleVote:
-    date: datetime
-    count_votes: int
-
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 
-# --- MOCK DATABASE (SINGLE SOURCE OF TRUTH) ---
+# --- MOCK DATABASE (Fully Synced with Chris) ---
+# Each entry now contains the exact keys Chris specified
 MOCK_DB = {
     "1": {
-        "id": 1,
-        "title": "Leeres Event",
-        "start_datetime": "Noch nicht festgelegt",
-        "description": "Leer",
-        "date_start": None,
-        "options": []
+        "appointment": {
+            "id": 1,
+            "title": "Leeres Event",
+            "description": "Dieses Event hat noch keine Termine.",
+            "organizer": "Daniek Schuiling",
+            "date_start": None # Chris's date field
+        },
+        "location": "Büro A, Etage 2",
+        "poll": None,
+        "choices": [],
+        "attendance_status": None,
+        "votes": 0
     },
     "2": {
-        "id": 2,
-        "title": "Doodle",
-        "start_datetime": "Abstimmung ausstehend",
-        "description": "Bitte stimme ab",
-        "date_start": None,
-        "options": [
-            {"id": 101, "date": "01.05.2026, 13:00"},
-            {"id": 102, "date": "15.05.2026, 12:00"},
-            {"id": 103, "date": "21.05.2026, 13:30"}
-        ]
+        "appointment": {
+            "id": 2,
+            "title": "Doodle",
+            "description": "Bitte stimme für die gewünschten Termine ab.",
+            "organizer": "Gerald von Rivia",
+            "date_start": None
+        },
+        "location": "Hauptstraße 1, 12345 Berlin",
+        "poll": True,
+        "choices": [
+            {"id": 101, "date": "01.05.2026, 13:00", "votes": 3},
+            {"id": 102, "date": "15.05.2026, 12:00", "votes": 1},
+            {"id": 103, "date": "21.05.2026, 13:30", "votes": 4}
+        ],
+        "attendance_status": None,
+        "votes": 8
     },
     "3": {
-        "id": 3,
-        "title": "Festes Datum beispiel",
-        "start_datetime": "25.03.2026 14:00",
-        "description": "Dieses Event hat ein festes Datum.",
-        "date_start": datetime(2026, 3, 25, 14, 0),
-        "options": []
-    },
-    "4": {
-        "id": 4,
-        "title": "Festes Datum beispiel 2",
-        "start_datetime": "15.12.2026 18:00",
-        "description": "Dieses Event hat ein festes Datum.",
-        "date_start": datetime(2026, 12, 15, 18, 0),
-        "options": []
+        "appointment": {
+            "id": 3,
+            "title": "Festes Datum Beispiel",
+            "description": "Dieses Event hat ein festes Datum.",
+            "organizer": "Christopher Wollny",
+            "date_start": datetime(2026, 3, 25, 14, 0)
+        },
+        "location": "Konferenzraum Blau",
+        "poll": None,
+        "choices": [],
+        "attendance_status": "Nehme teil",
+        "votes": 0
     }
 }
-
 
 @app.route("/")
 def home():
     return render_template("index.html")
 
-
-# --- LOGIN ROUTE (MOCKED) ---
-@app.route("/users", methods=["POST"])
-def create_user():
-    return redirect(url_for("user_home", user_id=1))
-
-
-# --- DASHBOARD ROUTE ---
+# --- DASHBOARD ---
 @app.route("/users/<user_id>", methods=["GET"])
 def user_home(user_id):
     dummy_user = {"id": user_id, "name": "Daniek"}
+    # We pass the full data objects so home.html can find appointment.date_start
+    events_list = [v for v in MOCK_DB.values()]
+    return render_template("home.html", user=dummy_user, events=events_list, invitations=[])
 
-    # Pulls directly from the mock database above
-    dummy_events = [MOCK_DB["1"], MOCK_DB["2"]]
-    dummy_invitations = [MOCK_DB["3"], MOCK_DB["4"]]
-
+# --- DETAILS PAGE ---
+@app.route('/users/<user_id>/appointments/<appointment_id>', methods=['GET'])
+def get_appointment(user_id, appointment_id):
+    data = MOCK_DB.get(str(appointment_id), MOCK_DB["1"])
+    # Unpacking the data for the template
     return render_template(
-        "home.html",
-        user=dummy_user,
-        events=dummy_events,
-        invitations=dummy_invitations
+        "event_details.html",
+        user_id=user_id,
+        appointment=data["appointment"],
+        location=data["location"],
+        poll=data["poll"],
+        choices=data["choices"],
+        attendance_status=data["attendance_status"],
+        votes=data["votes"]
     )
 
+# --- DATE FIX ---
+@app.route('/users/<user_id>/appointments/<appointment_id>/date_fix', methods=['GET'])
+def date_fix(user_id, appointment_id):
+    data = MOCK_DB.get(str(appointment_id), MOCK_DB["2"])
+    return render_template(
+        "date_fix.html",
+        user_id=user_id,
+        appointment=data["appointment"],
+        choices=data["choices"],
+        total_votes=data["votes"],
+        total_invited=5
+    )
 
-# --- APPOINTMENT LOGIC ---
-@app.route("/users/<user_id>/appointments", methods=["POST"])
-def create_appointment(user_id):
-    title = request.form["title"]
-    description = request.form["description"]
-    date_start = datetime.now()
-    queries.create_appointment(title, int(user_id), 1, description, date_start)
-    return redirect(url_for("user_home", user_id=user_id))
-
-
+# --- SUPPORTING ROUTES ---
 @app.route('/users/<user_id>/appointments/create', methods=['GET'])
 def new_appointment(user_id):
     return render_template("create_event.html", user_id=user_id)
+@app.route("/users/<user_id>/appointments", methods=["POST"])
+def create_appointment(user_id):
+    """Handles the form submission from create_event.html"""
+    # In a real app, Chris would save the form data to the database here.
+    # For now, we just redirect you back to the dashboard.
+    return redirect(url_for("user_home", user_id=user_id))
 
-
-# 1. DETAILS/VOTING PAGE
-@app.route('/users/<user_id>/appointments/<appointment_id>', methods=['GET'])
-def get_appointment(user_id, appointment_id):
-    # .get() grabs the event from MOCK_DB, or defaults to event "1" if not found
-    mock_event = MOCK_DB.get(str(appointment_id), MOCK_DB["1"])
-    mock_options = mock_event["options"]
-
-    return render_template("event_details.html", event=mock_event, options=mock_options, user_id=user_id)
-
-
-# 2. EDIT PAGE
 @app.route('/users/<user_id>/appointments/<appointment_id>/edit', methods=['GET'])
 def edit_appointment(user_id, appointment_id):
-    # Grabs the exact same event data for the edit page
-    mock_event = MOCK_DB.get(str(appointment_id), MOCK_DB["1"])
-    return render_template("edit_event.html", event=mock_event, user_id=user_id)
+    data = MOCK_DB.get(str(appointment_id), MOCK_DB["1"])
+    return render_template("edit_event.html", event=data["appointment"], user_id=user_id)
 
-
-# 3. VOTING SUBMISSION
 @app.route('/users/<user_id>/appointments/<appointment_id>/vote', methods=['POST'])
 def create_vote(user_id, appointment_id):
     return redirect(url_for("user_home", user_id=user_id))
 
-
-# --- OTHER ROUTES ---
-@app.route("/appointments/showall", methods=["GET"])
-def show_all_appointments():
-    appointments = queries.get_all_appointments()
-    return jsonify(appointments)
-
-
-@app.route('/users/<user_id>/appointments/<appointment_id>/create_doodle', methods=['POST'])
-def create_doodle(appointment_id):
-    poll_description = "test poll"
-    poll = queries.create_poll(appointment_id, poll_description)
-    doodle_dates = [request.form["date1"], request.form["date2"], request.form["date3"]]
-    for doodle_date in doodle_dates:
-        queries.create_choice(poll.id, doodle_date)
-    return redirect(url_for("get_appointment", user_id=1, appointment_id=appointment_id))
-
+@app.route('/users/<user_id>/appointments/<appointment_id>/set_date', methods=['POST'])
+def set_fixed_date(user_id, appointment_id):
+    return redirect(url_for("get_appointment", user_id=user_id, appointment_id=appointment_id))
 
 if __name__ == '__main__':
     app.run(debug=True)

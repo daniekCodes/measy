@@ -5,54 +5,58 @@
         <div class="col-md-8">
 
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2>{{ event.title | default('Event Details') }}</h2>
+                <h2>{{ appointment.title | default('Event Details') }}</h2>
                 <a href="{{ url_for('user_home', user_id=user_id) }}"
-                   class="btn btn-outline-secondary btn-sm">Zurück</a>
+                   class="btn btn-outline-secondary btn-sm">Abbrechen</a>
             </div>
 
             <div class="card shadow-sm mb-4">
                 <div class="card-body p-4">
-                    <p class="mb-4">{{ event.description | default('Keine Beschreibung vorhanden.') }}</p>
+                    <p class="mb-4">{{ appointment.description | default('Keine Beschreibung vorhanden.') }}</p>
 
-                    <p class="mb-1 text-muted"><strong>Organisator:</strong> Max Mustermann</p>
-                    <p class="mb-0 text-muted"><strong>Ort:</strong> Hauptstraße 1, 12345 Berlin</p>
+                    <p class="mb-1 text-muted">
+                        <strong>Organisator:</strong> {{ appointment.organizer | default('Unbekannt') }}</p>
+                    <p class="mb-0 text-muted">
+                        <strong>Ort:</strong> {{ location | default('Kein Ort angegeben') }}</p>
                 </div>
             </div>
 
             <div class="card shadow-sm mb-4">
                 <div class="card-body p-4">
 
-                    <form action="{{ url_for('create_vote', user_id=user_id, appointment_id=event.id) }}" method="POST">
+                    <form action="{{ url_for('create_vote', user_id=user_id, appointment_id=appointment.id) }}" method="POST">
 
-                        {% if options and options|length > 0 %}
+                        {% if poll %}
                             <h5 class="mb-4">Abstimmungsoptionen</h5>
 
-                            {% for option in options %}
-                                <div class="d-flex justify-content-between align-items-center mb-3 p-3 border rounded">
-                                    <span class="fw-bold">{{ option.date }}</span>
+                            {% for choice in choices %} <div class="d-flex justify-content-between align-items-center mb-3 p-2 border rounded">
+                                    <span class="fw-bold">{{ choice.date }}</span>
 
-                                    <div>
-                                        <input type="radio" name="choice_{{ option.id }}" id="yes_{{ option.id }}"
-                                               value="yes">
-                                        <label for="yes_{{ option.id }}" class="me-3 text-success fw-bold">Nehme
-                                            teil</label>
+                                    <div class="btn-group" role="group">
+                                        <input type="radio" class="btn-check" name="choice_{{ choice.id }}"
+                                               id="yes_{{ choice.id }}" value="yes" autocomplete="off">
+                                        <label class="btn btn-outline-success" for="yes_{{ choice.id }}">Nehme teil</label>
 
-                                        <input type="radio" name="choice_{{ option.id }}" id="no_{{ option.id }}"
-                                               value="no" checked>
-                                        <label for="no_{{ option.id }}" class="text-secondary">Nehme nicht teil</label>
+                                        <input type="radio" class="btn-check" name="choice_{{ choice.id }}"
+                                               id="no_{{ choice.id }}" value="no" autocomplete="off" checked>
+                                        <label class="btn btn-outline-secondary" for="no_{{ choice.id }}">Nehme nicht teil</label>
                                     </div>
                                 </div>
                             {% endfor %}
 
-                            <div class="text-end mt-4">
+                            <div class="d-flex justify-content-end gap-2 mt-4">
+                                <a href="{{ url_for('date_fix', user_id=user_id, appointment_id=appointment.id) }}"
+                                   class="btn btn-secondary fw-bold px-4"
+                                   style="background-color: #e2d8ea; color: black; border: 1px solid #ccc;">Ergebnisse anzeigen</a>
+
                                 <button type="submit" class="btn btn-primary fw-bold px-4">Abstimmen</button>
                             </div>
 
-                        {% elif event.date_start %}
+                        {% elif appointment.date_start %}
                             <h5 class="mb-4">Termin</h5>
 
                             <div class="d-flex justify-content-between align-items-center p-2 border rounded mb-3">
-                                <span class="fw-bold">{{ event.date_start.strftime('%d.%m.%Y, %H:%M') if event.date_start }}</span>
+                                <span class="fw-bold">{{ appointment.date_start.strftime('%d.%m.%Y, %H:%M') if appointment.date_start }}</span>
 
                                 <div class="btn-group" role="group">
                                     <input type="radio" class="btn-check" name="vote_fixed" id="yes_fixed" value="yes"
@@ -78,7 +82,7 @@
             </div>
 
             <div class="text-center mt-5">
-                <a href="{{ url_for('edit_appointment', user_id=user_id, appointment_id=event.id) }}"
+                <a href="{{ url_for('edit_appointment', user_id=user_id, appointment_id=appointment.id) }}"
                    class="btn btn-secondary px-5">Bearbeiten</a>
             </div>
 
