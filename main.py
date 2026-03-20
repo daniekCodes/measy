@@ -15,7 +15,7 @@ MOCK_DB = {
             "organizer": "Test User",
             "date_start": None # Chris's date field
         },
-        "location": "Büro A, Etage 2",
+        "location": "Hauptstraße 1, 12345 Berlin",
         "poll": None,
         "choices": [],
         "attendance_status": None,
@@ -25,8 +25,8 @@ MOCK_DB = {
         "appointment": {
             "id": 2,
             "title": "Doodle",
-            "description": "Bitte stimme für die gewünschten Termine ab.",
-            "organizer": "Gerald von Rivia",
+            "description": "Bitte abstimmen",
+            "organizer": "Test User",
             "date_start": None
         },
         "location": "Hauptstraße 1, 12345 Berlin",
@@ -43,11 +43,11 @@ MOCK_DB = {
         "appointment": {
             "id": 3,
             "title": "Festes Datum Beispiel",
-            "description": "Dieses Event hat ein festes Datum.",
-            "organizer": "Christopher Wollny",
+            "description": "Hat ein festes Datum.",
+            "organizer": "Test User",
             "date_start": datetime(2026, 3, 25, 14, 0)
         },
-        "location": "Konferenzraum Blau",
+        "location": "Hauptstraße 1, 12345 Berlin",
         "poll": None,
         "choices": [],
         "attendance_status": "Nehme teil",
