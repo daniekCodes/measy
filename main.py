@@ -29,7 +29,9 @@ def user_home(user_id):
                 events[-1]["poll"] = poll
     for attendance in queries.get_attendances_by_user_id(user_id):
             att_appointment = queries.get_appointment_by_id(attendance.appointment_id)
-            invitations.append(att_appointment)
+            invitations.append(att_appointment.__dict__)
+            poll = queries.get_poll_by_appointment_id(att_appointment.id)
+            invitations[-1]["poll"] = poll
     return render_template("home.html", user={"id": user_id}, events=events, invitations=invitations)
 
 @app.route("/users", methods=["POST"])
@@ -216,9 +218,10 @@ def new_appointment(user_id):
 @app.get("/users/<user_id>/appointments/<appointment_id>/Date-fix")
 def date_fix(user_id, appointment_id):
     appointment = queries.get_appointment_by_id(appointment_id)
+    user = queries.get_user_by_id(user_id)
     if not appointment:
         return "Not allowed - appointment doesnt exist"
-    if user_id != appointment.user_id:
+    if user.id != appointment.user_id:
         return "Not allowed - user not organizer"
     poll = queries.get_poll_by_appointment_id(appointment_id)
     if not poll:
@@ -250,7 +253,7 @@ def create_vote(user_id, appointment_id):
     if not user or not appointment:
         return "Forbidden"
 
-    if request.form["vote_fixed"]:
+    if request.form.get("vote_fixed", None):
         user_attends = True if request.form["vote_fixed"] == "yes" else False
         attendance = None
         attendances = queries.get_attendances_by_user_id(user.id)

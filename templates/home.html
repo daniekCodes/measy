@@ -65,9 +65,9 @@
                     <tr>
                         <td class="fw-bold">{{ invitation.title }}</td>
                         <td class="text-muted">
-                            {% if invitation.date_start %}
-                                {{ invitation.date_start.strftime('%d.%m.%Y %H:%M') }}
-                            {% elif sth != None %}
+                            {% if invitation.start_datetime %}
+				{{ invitation.start_datetime.strftime('%d.%m.%Y %H:%M') }} - {{ invitation.end_datetime.strftime('%H:%M') }}
+                            {% elif invitation.poll %}
                                 Abstimmung läuft
                             {% else %}
                                 Noch festzulegen
