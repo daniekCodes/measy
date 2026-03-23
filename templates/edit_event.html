@@ -84,6 +84,11 @@
                             <input type="radio" name="meeting_type" id="meet_doodle" value="doodle_meeting"
                                    onchange="meeting_toggle()" checked>
                             <label for="meet_doodle">Abstimmung</label>
+
+                            <input type="radio" name="meeting_type" id="meet_none" value="none"
+                                   onchange="meeting_toggle()"
+                                   {% if not appointment.start_datetime and not poll %}checked{% endif %}>
+                            <label for="meet_none">Noch nicht festgelegt</label>
                         </div>
 
                         <div id="fixed_placeholder" class="mb-4" style="display: none;">
