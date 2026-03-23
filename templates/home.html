@@ -24,9 +24,9 @@
                         <td class="fw-bold">{{ event.title }}</td>
 
                         <td class="text-muted">
-                            {% if event.date_start %}
-                                {{ event.date_start.strftime('%d.%m.%Y %H:%M') }}
-                            {% elif sth != None %}
+                            {% if event.start_datetime and event.end_datetime %}
+{{ event.start_datetime.strftime('%d.%m.%Y %H:%M') }} - {{ event.end_datetime.strftime('%d.%m.%Y %H:%M') }}
+                            {% elif event.poll %}
                                 Abstimmung läuft
                             {% else %}
                                 Noch festzulegen

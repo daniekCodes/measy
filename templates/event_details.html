@@ -23,14 +23,14 @@
 
             <div class="card shadow-sm mb-4">
                 <div class="card-body p-4">
-                    <form action="{{ url_for('create_vote', user_id=user_id, appointment_id=event.id) }}" method="POST">
+                    <form action="{{ url_for('create_vote', user_id=user.id, appointment_id=event.id) }}" method="POST">
 
                         {% if poll %}
                             <h5 class="mb-4">Abstimmungsoptionen</h5>
 
                             {% for choice in choices %}
                                 <div class="d-flex justify-content-between align-items-center mb-3 p-2 border rounded">
-                                    <span class="fw-bold">{{ choice.date }}</span>
+                                    <span class="fw-bold">{{ choice.label }}</span>
 
                                     <div class="btn-group" role="group">
                                         <input type="radio" class="btn-check" name="choice_{{ choice.id }}"
@@ -47,24 +47,23 @@
                             {% endfor %}
 
                             <div class="d-flex justify-content-end gap-2 mt-4">
-                                <a href="{{ url_for('date_fix', user_id=user_id, appointment_id=event.id) }}"
+                                <a href="{{ url_for('date_fix', user_id=user.id, appointment_id=event.id) }}"
                                    class="btn btn-outline-secondary fw-bold px-4">Ergebnisse anzeigen</a>
                                 <button type="submit" class="btn btn-primary fw-bold px-4">Abstimmen</button>
                             </div>
 
-                        {% elif event.date_start %}
+                        {% elif event.start_datetime %}
                             <h5 class="mb-4">Teilnahme bestätigen</h5>
-
                             <div class="d-flex justify-content-between align-items-center p-2 border rounded mb-3">
-                                <span class="fw-bold">{{ event.date_start.strftime('%d.%m.%Y, %H:%M') }}</span>
+				<span class="fw-bold">{{ event.start_datetime.strftime('%d.%m.%Y, %H:%M') }} - {{ event.end_datetime.strftime('%H:%M')}}</span>
 
                                 <div class="btn-group" role="group">
                                     <input type="radio" class="btn-check" name="vote_fixed" id="yes_fixed" value="yes"
-                                           autocomplete="off" {% if attendance_status == 'Nehme teil' %}checked{% endif %}>
+                                           autocomplete="off" {% if attendance_status == 'confirmed' %}checked{% endif %}>
                                     <label class="btn btn-outline-success" for="yes_fixed">Nehme teil</label>
 
                                     <input type="radio" class="btn-check" name="vote_fixed" id="no_fixed" value="no"
-                                           autocomplete="off" {% if attendance_status != 'Nehme teil' %}checked{% endif %}>
+                                           autocomplete="off" {% if attendance_status != 'confirmed' %}checked{% endif %}>
                                     <label class="btn btn-outline-secondary" for="no_fixed">Nehme nicht teil</label>
                                 </div>
                             </div>

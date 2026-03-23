@@ -23,7 +23,10 @@ def user_home(user_id):
     invitations = []
     for appointment in queries.get_all_appointments():
         if appointment.user_id == int(user_id):
-            events.append(appointment)
+            events.append(appointment.__dict__)
+            if not appointment.start_datetime and not appointment.end_datetime:
+                poll = queries.get_poll_by_appointment_id(appointment.id)
+                events[-1]["poll"] = poll
     for attendance in queries.get_attendances_by_user_id(user_id):
             att_appointment = queries.get_appointment_by_id(attendance.appointment_id)
             invitations.append(att_appointment)
@@ -163,18 +166,35 @@ def get_appointment(user_id, appointment_id):
     if not appointment or not user:
         return redirect(url_for("home"))
     organizer = queries.get_user_by_id(appointment.user_id)
-    attendances = queries.get_attendances_by_user_id(appointment_id)
+    attendances = queries.get_attendances_by_user_id(user.id)
+    attendance_status = None
     for attendance in attendances:
-        if attendance.appointment_id == appointment_id:
-            appointment = attendance
+        if attendance.appointment_id == appointment.id:
+            # appointment = attendance
+            attendance_status = attendance.status_attend
     options = show_doodle(appointment.id)
     location = queries.get_location_by_id(appointment.location_id)
+    poll = queries.get_poll_by_appointment_id(appointment.id)
+    choices = []
+    poll_choices = None
+    if poll:
+        poll_choices = queries.get_choices_by_poll_id(poll.id)
+        for poll_choice in poll_choices:
+            votes = queries.get_votes_by_choice(poll_choice.id)
+            choices.append(poll_choice.__dict__)
+            for vote in votes:
+                if vote.user_id == user.id:
+                    choices[-1]["user_voted_yes"] = vote.can_attend
+
     return render_template("event_details.html", 
                            user={"id": user.id, "name": user.name},
                            event=appointment, 
                            options=options, 
                            location=location,
-                           organizer=organizer)
+                           organizer=organizer,
+                           poll=poll,
+                           choices=choices,
+                           attendance_status=attendance_status)
 
 @app.get("/users/<user_id>/appointments/<appointment_id>/edit")
 def edit_appointment(user_id, appointment_id):
@@ -194,21 +214,21 @@ def new_appointment(user_id):
     return render_template("create_event.html", user={"id": user.id})
 
 @app.get("/users/<user_id>/appointments/<appointment_id>/Date-fix")
-def get_fix_date(user_id, appointment_id):
+def date_fix(user_id, appointment_id):
     appointment = queries.get_appointment_by_id(appointment_id)
     if not appointment:
-        return render_template("Date-fix.html")
+        return "Not allowed - appointment doesnt exist"
     if user_id != appointment.user_id:
-        return render_template("Date-fix.html")
+        return "Not allowed - user not organizer"
     poll = queries.get_poll_by_appointment_id(appointment_id)
     if not poll:
-        return render_template("Date-fix.html")
+        return "Not allowed - No poll"
     choices = queries.get_choices_by_poll_id(poll.id)
      
     attendances = queries.get_attendances_by_appointment_id(appointment_id)
     num_user_invited = len(attendances)
     voted_options = []
-    return 
+    return render_template("date_fix.html", user={"id": user_id}, appointment=appointment, choices=choices)
 
 def show_doodle(appointment_id):
     options = []
@@ -224,7 +244,37 @@ def show_doodle(appointment_id):
 
 @app.route('/users/<user_id>/appointments/<appointment_id>/vote', methods=['POST'])
 def create_vote(user_id, appointment_id):
-    pass
+    user = queries.get_user_by_id(user_id)
+    appointment = queries.get_appointment_by_id(appointment_id)
+
+    if not user or not appointment:
+        return "Forbidden"
+
+    if request.form["vote_fixed"]:
+        user_attends = True if request.form["vote_fixed"] == "yes" else False
+        attendance = None
+        attendances = queries.get_attendances_by_user_id(user.id)
+        for att in attendances:
+            if att.appointment_id == appointment.id:
+                attendance = att
+        if attendance:
+            status_attend = "confirmed" if user_attends else "declined"
+            queries.update_attendance(attendance.id, status_attend=status_attend)
+    else:
+        for key in request.form:
+            if key.startswith("choice_"):
+                choice_id = key[7:]
+                voted_yes = True if request.form[key] == "yes" else False
+                votes = queries.get_votes_by_choice(choice_id)
+                votes = [vote for vote in votes if vote.user_id == user.id]
+                if votes:
+                    vote = votes[0]
+                    if vote.can_attend != voted_yes:
+                        queries.update_vote(vote.id, can_attend=voted_yes)
+                else:
+                    vote_id = queries.create_vote(user_id, choice_id, voted_yes)
+                    vote = queries.get_vote_by_id(vote_id)
+    return redirect(url_for("user_home", user_id=user_id))
 
 if __name__ == '__main__':
     app.run(debug=True)
