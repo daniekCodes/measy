@@ -6,13 +6,13 @@
 
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>Neuer Event</h2>
-            <a href="{{ url_for('user_home', user_id=user_id) }}" class="btn btn-outline-secondary btn-sm">Abbrechen</a>
+            <a href="{{ url_for('user_home', user_id=user.id) }}" class="btn btn-outline-secondary btn-sm">Abbrechen</a>
         </div>
 
         <div class="card shadow-sm">
             <div class="card-body p-4">
 
-                <form action="{{ url_for('create_appointment', user_id=user_id) }}" method="POST">
+                <form action="{{ url_for('create_appointment', user_id=user.id) }}" method="POST">
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">Event Name</label>
@@ -37,7 +37,7 @@
                         <input type="radio" name="location_type" id="loc_physical" value="physical" onchange="location_toggle()" checked>
                         <label for="loc_physical" class="me-3">Vor Ort</label>
 
-                        <input type="radio" name="location_type" id="loc_online" value="online" onchange="location_toggle()">
+                        <input type="radio" name="location_type" id="loc_online" value="virtual" onchange="location_toggle()">
                         <label for="loc_online">Online</label>
                     </div>
 

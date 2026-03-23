@@ -107,7 +107,7 @@ def create_appointment(user_id):
             queries.create_attendance(attending_user_id, appointment_id)
 
     return redirect(url_for("user_home", 
-            user={"id": user.id, "name": user.name}))
+            user_id=user.id))
 
 @app.get("/users/<user_id>/attendances")
 def get_attendances_for_user(user_id):
@@ -162,7 +162,7 @@ def get_appointment(user_id, appointment_id):
     user = queries.get_user_by_id(user_id)
     if not appointment or not user:
         return redirect(url_for("home"))
-    organizer = queries.get_user_by_id(appointment.id)
+    organizer = queries.get_user_by_id(appointment.user_id)
     attendances = queries.get_attendances_by_user_id(appointment_id)
     for attendance in attendances:
         if attendance.appointment_id == appointment_id:
@@ -174,7 +174,7 @@ def get_appointment(user_id, appointment_id):
                            event=appointment, 
                            options=options, 
                            location=location,
-                           organizer={"name": organizer.name})
+                           organizer=organizer)
 
 @app.get("/users/<user_id>/appointments/<appointment_id>/edit")
 def edit_appointment(user_id, appointment_id):
