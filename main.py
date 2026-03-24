@@ -216,14 +216,21 @@ def edit_appointment(user_id, appointment_id):
     poll = queries.get_poll_by_appointment_id(appointment.id)
     choices = []
     if poll:
-        choices = queries.get_choices_by_poll_id(poll.id)
-        for i, choice in enumerate(choices):
+        pre_choices = queries.get_choices_by_poll_id(poll.id)
+        for i, choice in enumerate(pre_choices):
             dts = choice.label.split(" - ")
-            dt_start = datetime.fromisoformat(dts[0])
-            dt_end = datetime.fromisoformat(dts[1])
-            choices[i] = choice.__dict__ | {"date": dt_start.date(),
-                                            "start_time": dt_start.time(),
-                                            "end_time": dt_end.time()}
+            try:
+                dt_start = datetime.fromisoformat(dts[0])
+                dt_end = datetime.fromisoformat(dts[1])
+                choices.append(choice.__dict__ | {"date": dt_start.date(),
+                                                "start_time": dt_start.time(),
+                                                "end_time": dt_end.time()})
+            except ValueError:
+                continue
+        # test_str = ""
+        # for choice in choices:
+        #     test_str += str(choice)
+        # return test_str
     return render_template("edit_event.html", 
                            user={"id": user.id, "name": user.name},
                            event=appointment,
@@ -239,7 +246,7 @@ def new_appointment(user_id):
     return render_template("create_event.html", user={"id": user.id})
 
 @app.get("/users/<user_id>/appointments/<appointment_id>/Date-fix")
-def date_fix(user_id, appointment_id):
+def set_fixed_date(user_id, appointment_id):
     appointment = queries.get_appointment_by_id(appointment_id)
     user = queries.get_user_by_id(user_id)
     if not appointment:
@@ -250,12 +257,28 @@ def date_fix(user_id, appointment_id):
     if not poll:
         return "Not allowed - No poll"
     choices = queries.get_choices_by_poll_id(poll.id)
-     
+    total_votes = 0
+    voted = []
+    for i, choice in enumerate(choices):
+        votes = queries.get_votes_by_choice(choice.id, can_attend=True)
+        voted = voted + [vote.user_id for vote in votes]
+        start_datetime = datetime.fromisoformat(choice.label.split(" - ")[0])
+        end_datetime = datetime.fromisoformat(choice.label.split(" - ")[1])
+        choices[i] = choice.__dict__ | {"votes": len(votes),
+                                        "start_datetime": start_datetime,
+                                        "end_datetime": end_datetime}
+    total_votes = len(set(voted))
+    total_invited = None
     attendances = queries.get_attendances_by_appointment_id(appointment_id)
-    num_user_invited = len(attendances)
-    voted_options = []
-    return render_template("date_fix.html", user={"id": user_id}, appointment=appointment, choices=choices)
-
+    total_invited = len(attendances)    
+    return render_template("date_fix.html", 
+                           user={"id": user.id}, 
+                           appointment=appointment,
+                           choices=choices,
+                           total_votes=total_votes,
+                           total_invited=total_invited
+                           )
+     
 def show_doodle(appointment_id):
     options = []
     # no poll created 
@@ -375,5 +398,19 @@ def update_event(user_id, appointment_id):
  
     return redirect(url_for("get_appointment", user_id=user.id, appointment_id=appointment.id))
 
+@app.post("/users/<user_id>/appointments/<appointment_id>/date-fix")
+def date_fix(user_id, appointment_id):
+    user = queries.get_user_by_id(user_id)
+    appointment = queries.get_appointment_by_id(appointment_id)
+    if not user or not appointment:
+        redirect(url_for("index"))
+    final_choice_id = request.form.get("final_choice_id", None)
+    if final_choice_id:
+        choice = queries.get_choice_by_id(final_choice_id)
+        start_datetime = datetime.fromisoformat(choice.label.split(" - ")[0])
+        end_datetime = datetime.fromisoformat(choice.label.split(" - ")[1])
+        queries.update_appointment(appointment.id, start_datetime=start_datetime,
+                                   end_datetime=end_datetime)
+        return redirect(url_for("user_home", user_id=user.id))
 if __name__ == '__main__':
     app.run(debug=True)

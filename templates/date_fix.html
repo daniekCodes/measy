@@ -2,17 +2,17 @@
 
 {% block content %}
 <div class="container mt-5">
-
+    {% if user and appointment %}
     <h3 class="mb-4">Abstimmung</h3>
 
-    <form action="{{ url_for('set_fixed_date', user_id=user_id, appointment_id=appointment.id) }}" method="POST">
+    <form action="{{ url_for('date_fix', user_id=user.id, appointment_id=appointment.id) }}" method="POST">
 
         <div class="mb-4">
             {% for choice in choices %}
             <div class="mb-2">
                 <input type="radio" name="final_choice_id" id="opt_{{ choice.id }}" value="{{ choice.id }}" required>
                 <label for="opt_{{ choice.id }}" class="ms-2">
-                    Option {{ loop.index }}: {{ choice.votes }} Personen für: {{ choice.date }}
+                  Option {{ loop.index }}: {{ choice.votes }} Personen für: {{ choice.start_datetime.strftime('%A, %d.%m.%Y, %H:%M')}} - {{choice.end_datetime.strftime('%H:%M')}}
                 </label>
             </div>
             {% endfor %}
@@ -25,6 +25,6 @@
 
         <button type="submit" class="btn btn-secondary" style="background-color: #e2d8ea; color: black; border: 1px solid #ccc;">Termin festlegen</button>
     </form>
-
+  {% endif %}
 </div>
 {% endblock %}

@@ -6,7 +6,7 @@
 
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>{{ event.title | default('Event Details') }}</h2>
-                <a href="{{ url_for('user_home', user_id=user_id) }}"
+                <a href="{{ url_for('user_home', user_id=user.id) }}"
                    class="btn btn-outline-secondary btn-sm">Abbrechen</a>
             </div>
 
@@ -47,7 +47,7 @@
                             {% endfor %}
 
                             <div class="d-flex justify-content-end gap-2 mt-4">
-                                <a href="{{ url_for('date_fix', user_id=user.id, appointment_id=event.id) }}"
+                                <a href="{{ url_for('set_fixed_date', user_id=user.id, appointment_id=event.id) }}"
                                    class="btn btn-outline-secondary fw-bold px-4">Ergebnisse anzeigen</a>
                                 <button type="submit" class="btn btn-primary fw-bold px-4">Abstimmen</button>
                             </div>
