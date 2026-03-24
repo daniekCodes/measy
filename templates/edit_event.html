@@ -6,14 +6,14 @@
 
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>Event bearbeiten</h2>
-                <a href="{{ url_for('user_home', user_id=user_id) }}"
+                <a href="{{ url_for('user_home', user_id=user.id) }}"
                    class="btn btn-outline-secondary btn-sm">Abbrechen</a>
             </div>
 
             <div class="card shadow-sm mb-4">
                 <div class="card-body p-4">
 
-                    <form action="{{ url_for('user_home', user_id=user_id) }}" method="GET">
+                    <form action="{{ url_for('update_event', user_id=user.id, appointment_id=event.id) }}" method="POST">
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">Event Name</label>
@@ -35,42 +35,43 @@
                         <hr class="mb-4">
 
                         <div class="mb-3">
-                            <label class="form-label fw-bold d-block">Ort</label>
-                            <input type="radio" name="location_type" id="loc_physical" value="physical"
-                                   onchange="location_toggle()" checked>
-                            <label for="loc_physical" class="me-3">Vor Ort</label>
+                            
+                              <label class="form-label fw-bold d-block">Ort</label>
+                              <input type="radio" name="location_type" id="loc_physical" value="physical" 
+                                onchange="location_toggle()" {% if location.meeting_type == "physical" %}checked {% endif %}>
+                              <label for="loc_physical" class="me-3">Vor Ort</label>
 
-                            <input type="radio" name="location_type" id="loc_online" value="online"
-                                   onchange="location_toggle()">
-                            <label for="loc_online">Online</label>
+                              <input type="radio" name="location_type" id="loc_online" value="virtual" 
+                                onchange="location_toggle()" {% if location.meeting_type == "virtual" %} checked {% endif %}>
+                              <label for="loc_online">Online</label>
                         </div>
 
-                        <div id="physical_placeholder" class="mb-4" style="display: block;">
+                        <div id="physical_placeholder" class="mb-4" style="display: {% if location.meeting_type == "physical" %}block;{% else %}none;{% endif %}">
                             <div class="row g-2 mb-2">
                                 <div class="col-md-8">
-                                    <label class="form-label">Straße</label>
-                                    <input type="text" name="street" class="form-control">
+                                  <label class="form-label">Straße</label>
+                                  <input type="text" name="street" class="form-control" value={{location.street or ""}}>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Hausnummer</label>
-                                    <input type="text" name="housenumber" class="form-control">
+                                    <input type="text" name="housenumber" class="form-control" value={{location.house_number or ""}}>
                                 </div>
                             </div>
                             <div class="row g-2">
                                 <div class="col-md-4">
                                     <label class="form-label">PLZ</label>
-                                    <input type="text" name="plz" class="form-control">
+                                    <input type="text" name="plz" class="form-control" value={{location.postal_code or ""}}>
                                 </div>
                                 <div class="col-md-8">
                                     <label class="form-label">Ort</label>
-                                    <input type="text" name="city" class="form-control">
+                                    <input type="text" name="city" class="form-control" value={{location.city or ""}}>
                                 </div>
                             </div>
                         </div>
 
-                        <div id="online_placeholder" class="mb-4" style="display: none;">
+                        <div id="online_placeholder" class="mb-4" style="display: {% if location.meeting_type == "virtual" %}block;{% else %}none;{% endif %}">
                             <label class="form-label">Meeting-Link</label>
-                            <input type="url" name="meeting_link" class="form-control">
+                            <input type="url" name="meeting_link" class="form-control" value={{location.virtual_location or ""}}>
                         </div>
 
                         <hr class="mb-4">
@@ -78,11 +79,11 @@
                         <div class="mb-3">
                             <label class="form-label fw-bold d-block">Datum</label>
                             <input type="radio" name="meeting_type" id="meet_fixed" value="fixed_meeting"
-                                   onchange="meeting_toggle()">
+                                onchange="meeting_toggle()" {% if event.start_datetime %}checked{% endif %}>
                             <label for="meet_fixed" class="me-3">Festes Datum</label>
 
                             <input type="radio" name="meeting_type" id="meet_doodle" value="doodle_meeting"
-                                   onchange="meeting_toggle()" checked>
+                                     onchange="meeting_toggle()" {% if not event.start_datetime and poll %}checked{% endif %}>
                             <label for="meet_doodle">Abstimmung</label>
                         </div>
 
@@ -105,14 +106,14 @@
 
                         <div id="doodle_placeholder" class="mb-4" style="display: block;">
                             <label class="form-label fw-bold">Optionen für die Abstimmung</label>
-                            {% for i in range(1, 4) %}
+                            {% for choice in choices %}
                                 <div class="row g-2 mb-2">
-                                    <div class="col-md-4"><input type="date" name="option{{ i }}_date"
-                                                                 class="form-control"></div>
-                                    <div class="col-md-4"><input type="time" name="option{{ i }}_start"
-                                                                 class="form-control"></div>
-                                    <div class="col-md-4"><input type="time" name="option{{ i }}_end"
-                                                                 class="form-control"></div>
+                                    <div class="col-md-4"><input type="date" name="option{{ choice.id }}_date"
+                                         class="form-control" value={{choice.date}}></div>
+                                    <div class="col-md-4"><input type="time" name="option{{ choice.id }}_start"
+                                                                             class="form-control" value={{choice.start_time.strftime('%H:%M')}}></div>
+                                    <div class="col-md-4"><input type="time" name="option{{ choice.id }}_end"
+                                                                             class="form-control" value={{choice.end_time.strftime('%H:%M')}}></div>
                                 </div>
                             {% endfor %}
                         </div>

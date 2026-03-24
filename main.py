@@ -1,7 +1,9 @@
-from datetime import datetime
+from datetime import datetime, date
 from flask import Flask, redirect, render_template, request, jsonify, url_for
 import queries
 from dataclasses import dataclass
+from werkzeug.security import generate_password_hash, check_password_hash
+import re
 
 @dataclass
 class DoodleVote:
@@ -39,8 +41,14 @@ def create_user():
     email = request.form["email"]
     name = request.form["name"]
     password = request.form["password"]
-    queries.create_user(name, email, password)
+    password_hash = generate_password_hash(password)
     user = queries.get_user_by_email(email)
+    if user:
+        if not check_password_hash(user.password, password):
+            return redirect(url_for("home"))
+    else:
+        queries.create_user(name, email, password_hash)
+        user = queries.get_user_by_email(email)
     return redirect(url_for("user_home", user_id=user.id))
 
 @app.get("/users")
@@ -204,15 +212,30 @@ def edit_appointment(user_id, appointment_id):
     appointment = queries.get_appointment_by_id(appointment_id)
     if not user or not appointment:
         return render_template("home")
-    return render_template("edit_appointment.html", 
+    location = queries.get_location_by_id(appointment.location_id)
+    poll = queries.get_poll_by_appointment_id(appointment.id)
+    choices = []
+    if poll:
+        choices = queries.get_choices_by_poll_id(poll.id)
+        for i, choice in enumerate(choices):
+            dts = choice.label.split(" - ")
+            dt_start = datetime.fromisoformat(dts[0])
+            dt_end = datetime.fromisoformat(dts[1])
+            choices[i] = choice.__dict__ | {"date": dt_start.date(),
+                                            "start_time": dt_start.time(),
+                                            "end_time": dt_end.time()}
+    return render_template("edit_event.html", 
                            user={"id": user.id, "name": user.name},
-                           appointment=appointment)
+                           event=appointment,
+                           location=location,
+                           poll=poll,
+                           choices=choices)
 
 @app.route('/users/<user_id>/appointments/create', methods=['GET'])
 def new_appointment(user_id):
     user = queries.get_user_by_id(user_id)
     if not user:
-        return render_template(url_for("home"))
+        return redirect(url_for("home"))
     return render_template("create_event.html", user={"id": user.id})
 
 @app.get("/users/<user_id>/appointments/<appointment_id>/Date-fix")
@@ -278,6 +301,79 @@ def create_vote(user_id, appointment_id):
                     vote_id = queries.create_vote(user_id, choice_id, voted_yes)
                     vote = queries.get_vote_by_id(vote_id)
     return redirect(url_for("user_home", user_id=user_id))
+
+@app.post("/users/<user_id>/appointments/<appointment_id>/update")
+def update_event(user_id, appointment_id):
+    user = queries.get_user_by_id(user_id)
+    appointment = queries.get_appointment_by_id(appointment_id)
+    location = queries.get_location_by_id(appointment.location_id)
+
+    event_title = request.form.get("title", None)
+    event_description = request.form.get("description", None)
+    queries.update_appointment(appointment.id, title=event_title, description=event_description) 
+
+    # user einladen - todo
+    event_invite_emails = request.form.get("invite_emails", None)
+    for invite_email in event_invite_emails.split():
+        invited_user = queries.get_user_by_email(invite_email)
+        if not invited_user:
+            invited_user_id = queries.create_user("", invite_email, "")
+            invited_user = queries.get_user_by_id(user_id)
+        # attendance erzeugen, wenn noch nicht existiert
+        attendances = queries.get_attendances_by_user_id(invited_user.id)
+        att = [x for x in attendances if x.appointment_id == appointment.id]
+        if not att:
+            queries.create_attendance(invited_user.id, appointment.id)
+
+    location_type = request.form.get("location_type", None)
+    location_street = request.form.get("street", None)
+    location_housenumber = request.form.get("housenumber", None)
+    location_plz = request.form.get("plz", None)
+    location_city = request.form.get("city", None)
+    location_meeting_link = request.form.get("meeting_link", None)
+
+    if location_type == "physical":
+        queries.update_location(location.id, 
+                                meeting_type=location_type,
+                                street=location_street,
+                                house_number=location_housenumber,
+                                postal_code=location_plz,
+                                city=location_city)
+    else:
+        queries.update_location(location.id,
+                                meeting_type=location_type,
+                                virtual_location=location_meeting_link)
+
+    fixed_date = request.form.get("fixed_date", None)
+    fixed_start_time = request.form.get("fixed_start_time", None)
+    fixed_end_time = request.form.get("fixed_end_time", None)
+
+    if fixed_date:
+        # Fixes Datum eingegeben
+        queries.update_appointment(appointment.id,  
+                                   start_datetime=datetime.combine(fixed_date, fixed_start_time),
+                                   end_datetime=datetime.combine(fixed_date, fixed_end_time))
+    else: 
+        options = []
+        for key in request.form:
+            if key.startswith("option"):
+                options.append(key)
+
+        for i in range(3):
+            option = options[i*3:i*3+3]
+            m = re.match("[0-9]+", key[6:])
+            if m:
+                start_idx, stop_idx = m.span()
+                option_id = option[0][6:][start_idx:stop_idx]
+                option_date = request.form.get(f"option{option_id}_date", None)
+                option_start = request.form.get(f"option{option_id}_start", None)
+                option_end = request.form.get(f"option{option_id}_end", None)
+                new_label = f"{option_date}T{option_start} - {option_date}T{option_end}"
+                choice = queries.get_choice_by_id(option_id)
+                queries.update_choice(option_id, label=new_label)
+                choice = queries.get_choice_by_id(option_id)
+ 
+    return redirect(url_for("get_appointment", user_id=user.id, appointment_id=appointment.id))
 
 if __name__ == '__main__':
     app.run(debug=True)
