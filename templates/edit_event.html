@@ -77,13 +77,16 @@
 
                         <div class="mb-3">
                             <label class="form-label fw-bold d-block">Datum</label>
+
                             <input type="radio" name="meeting_type" id="meet_fixed" value="fixed_meeting"
-                                   onchange="meeting_toggle()">
+                                   onchange="meeting_toggle()"
+                                   {% if appointment.start_datetime %}checked{% endif %}>
                             <label for="meet_fixed" class="me-3">Festes Datum</label>
 
                             <input type="radio" name="meeting_type" id="meet_doodle" value="doodle_meeting"
-                                   onchange="meeting_toggle()" checked>
-                            <label for="meet_doodle">Abstimmung</label>
+                                   onchange="meeting_toggle()"
+                                   {% if poll %}checked{% endif %}>
+                            <label for="meet_doodle" class="me-3">Abstimmung</label>
 
                             <input type="radio" name="meeting_type" id="meet_none" value="none"
                                    onchange="meeting_toggle()"
