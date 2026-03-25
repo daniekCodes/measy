@@ -17,7 +17,9 @@
                     <p class="mb-1 text-muted">
                         <strong>Organisator:</strong> {{ organizer.name | default('Unbekannt') }}</p>
                     <p class="mb-0 text-muted">
-                        <strong>Ort:</strong> {{ location.meeting_type | default('Kein Ort angegeben') }}</p>
+                        <strong>Ort:</strong> {% if location.meeting_type == "physical" %} {{location.street}} {{location.house_number}}, {{location.postal_code}} {{location.city}}
+                        {% else %} <a href={{location.virtual_location}}>{{location.virtual_location}}</a> {% endif %}
+                    </p>
                 </div>
             </div>
 
