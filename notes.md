@@ -1,1 +1,0 @@
-- home: Abstimmung läuft?? additional data needed?
