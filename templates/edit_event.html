@@ -109,7 +109,7 @@
                             </div>
                         </div>
 
-                        <div id="doodle_placeholder" class="mb-4" style="display: block;">
+                        <div id="doodle_placeholder" class="mb-4" style="display: {% if poll %} block {% else %} none {% endif %};">
                             <label class="form-label fw-bold">Optionen für die Abstimmung</label>
                             {% for i in range(3) %}
                             {% set choice = choices[i] if choices[i] else None %}

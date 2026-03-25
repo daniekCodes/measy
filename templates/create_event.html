@@ -5,7 +5,7 @@
         <div class="col-md-8">
 
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Neuer Event</h2>
+            <h2>Neues Event</h2>
             <a href="{{ url_for('user_home', user_id=user.id) }}" class="btn btn-outline-secondary btn-sm">Abbrechen</a>
         </div>
 
@@ -104,7 +104,7 @@
                             </div>
                         </div>
 
-                        <div id="doodle_placeholder" class="mb-4" style="display: block;">
+                        <div id="doodle_placeholder" class="mb-4" style="display: none;">
                             <label class="form-label fw-bold">Optionen für die Abstimmung</label>
                             {% for i in range(1, 4) %}
                                 <div class="row g-2 mb-2">
