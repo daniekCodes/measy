@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row justify-content-center mt-4 mb-5">
+        <div class="col-md-8">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>{{ event.title | default('Event Details') }}</h2>
+                <a href="{{ url_for('user_home', user_id=user.id) }}"
+                   class="btn btn-outline-secondary btn-sm">Abbrechen</a>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <p class="mb-4">{{ event.description | default('Keine Beschreibung vorhanden.') }}</p>
+
+                    <p class="mb-1 text-muted">
+                        <strong>Organisator:</strong> {{ organizer.name | default('Unbekannt') }}</p>
+                    <p class="mb-0 text-muted">
+                        <strong>Ort:</strong> {{ location.meeting_type | default('Kein Ort angegeben') }}</p>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <form action="{{ url_for('create_vote', user_id=user.id, appointment_id=event.id) }}" method="POST">
+
+                        {% if poll %}
+                            <h5 class="mb-4">Abstimmungsoptionen</h5>
+
+                            {% for choice in choices %}
+                                <div class="d-flex justify-content-between align-items-center mb-3 p-2 border rounded">
+                                    <span class="fw-bold">{{ choice.start_datetime.strftime('%d.%m.%Y, %H:%M') }} - {{ choice.end_datetime.strftime('%H:%M') }}</span>
+
+                                    <div class="btn-group" role="group">
+                                        <input type="radio" class="btn-check" name="choice_{{ choice.id }}"
+                                               id="yes_{{ choice.id }}" value="yes" autocomplete="off"
+                                               {% if choice.user_voted_yes %}checked{% endif %}>
+                                        <label class="btn btn-outline-success" for="yes_{{ choice.id }}">Nehme teil</label>
+
+                                        <input type="radio" class="btn-check" name="choice_{{ choice.id }}"
+                                               id="no_{{ choice.id }}" value="no" autocomplete="off"
+                                               {% if not choice.user_voted_yes %}checked{% endif %}>
+                                        <label class="btn btn-outline-secondary" for="no_{{ choice.id }}">Nehme nicht teil</label>
+                                    </div>
+                                </div>
+                            {% endfor %}
+
+                            <div class="d-flex justify-content-end gap-2 mt-4">
+                                <a href="{{ url_for('set_fixed_date', user_id=user.id, appointment_id=event.id) }}"
+                                   class="btn btn-outline-secondary fw-bold px-4">Ergebnisse anzeigen</a>
+                                <button type="submit" class="btn btn-primary fw-bold px-4">Abstimmen</button>
+                            </div>
+
+                        {% elif event.start_datetime %}
+                            <h5 class="mb-4">Teilnahme bestätigen</h5>
+                            <div class="d-flex justify-content-between align-items-center p-2 border rounded mb-3">
+				<span class="fw-bold">{{ event.start_datetime.strftime('%d.%m.%Y, %H:%M') }} - {{ event.end_datetime.strftime('%H:%M')}}</span>
+
+                                <div class="btn-group" role="group">
+                                    <input type="radio" class="btn-check" name="vote_fixed" id="yes_fixed" value="yes"
+                                           autocomplete="off" {% if attendance_status == 'confirmed' %}checked{% endif %}>
+                                    <label class="btn btn-outline-success" for="yes_fixed">Nehme teil</label>
+
+                                    <input type="radio" class="btn-check" name="vote_fixed" id="no_fixed" value="no"
+                                           autocomplete="off" {% if attendance_status != 'confirmed' %}checked{% endif %}>
+                                    <label class="btn btn-outline-secondary" for="no_fixed">Nehme nicht teil</label>
+                                </div>
+                            </div>
+
+                            <div class="text-end mt-4">
+                                <button type="submit" class="btn btn-primary fw-bold px-4">Speichern</button>
+                            </div>
+
+                        {% else %}
+                            <p class="text-muted mb-0 italic">Noch keine Termine zur Abstimmung festgelegt.</p>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-center mt-5">
+                <a href="{{ url_for('edit_appointment', user_id=user.id, appointment_id=event.id) }}"
+                   class="btn btn-secondary px-5">Bearbeiten</a>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
