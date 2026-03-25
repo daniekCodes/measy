@@ -2,8 +2,6 @@
 
 **M'easy** is a centralized web platform designed to solve the challenges of unorganized group coordination and information loss within traditional chat histories. The application provides a structured environment for creating, voting on, managing, and finalizing group appointments.
 
----
-
 ## Core Features
 
 ### Centralized Voting
@@ -18,8 +16,6 @@
 ### Streamlined Workflow
 * The platform offers a clear path from initial event creation through the voting process to final appointment confirmation.
 
----
-
 ## Tech Stack
 
 ### Frontend
@@ -31,8 +27,6 @@
 * **Language**: Python 3.12.
 * **Web Framework**: Flask.
 * **ORM**: SQLAlchemy with SQLite integration.
-
----
 
 ## Application Architecture
 
@@ -49,8 +43,6 @@ Flask routing provides logical navigation:
 * `/users/<user_id>/appointments/<appointment_id>`: Event details and editing.
 * `/users/<user_id>/appointments/create`: New voting event creation.
 
----
-
 ## Development Roadmap
 
 ### Immediate Priorities
@@ -63,13 +55,9 @@ Flask routing provides logical navigation:
 * **Mobile Optimization**: Enhanced responsive design.
 * **Reminder System**: Push notifications before voting deadlines.
 
----
-
 # M'easy – Zentrale Terminabstimmung für Gruppen
 
 **M'easy** ist eine zentrale Webplattform, die die Herausforderungen unübersichtlicher Gruppenkoordination und Informationsverlust in Chat-Verläufen löst. Die Anwendung bietet eine strukturierte Umgebung zur Erstellung, Abstimmung, Verwaltung und Fixierung von Gruppenterminen.
-
----
 
 ## Kernfunktionen
 
@@ -85,8 +73,6 @@ Flask routing provides logical navigation:
 ### Strukturierter Workflow
 * Ein klarer Pfad von der ersten Event-Erstellung über die Abstimmung bis hin zur finalen Terminbestätigung.
 
----
-
 ## Technischer Stack
 
 ### Frontend
@@ -98,8 +84,6 @@ Flask routing provides logical navigation:
 * **Sprache**: Python 3.12.
 * **Web-Framework**: Flask.
 * **ORM**: SQLAlchemy mit SQLite-Anbindung.
-
----
 
 ## Anwendungsarchitektur
 
@@ -115,8 +99,6 @@ Logische Flask-Routings:
 * `/users/<user_id>`: Persönliche Terminübersicht.
 * `/users/<user_id>/appointments/<appointment_id>`: Event-Details und Bearbeitung.
 * `/users/<user_id>/appointments/create`: Neues Abstimmungsevent.
-
----
 
 ## Entwicklungsroadmap
 
