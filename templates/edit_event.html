@@ -6,7 +6,7 @@
 
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>Event bearbeiten</h2>
-                <a href="{{ url_for('user_home', user_id=user.id) }}"
+                <a href="{{ url_for('get_appointment', user_id=user.id, appointment_id=event.id) }}"
                    class="btn btn-outline-secondary btn-sm">Abbrechen</a>
             </div>
 
@@ -35,13 +35,13 @@
                         <hr class="mb-4">
 
                         <div class="mb-3">
-                            
+
                               <label class="form-label fw-bold d-block">Ort</label>
-                              <input type="radio" name="location_type" id="loc_physical" value="physical" 
+                              <input type="radio" name="location_type" id="loc_physical" value="physical"
                                 onchange="location_toggle()" {% if location.meeting_type == "physical" %}checked {% endif %}>
                               <label for="loc_physical" class="me-3">Vor Ort</label>
 
-                              <input type="radio" name="location_type" id="loc_online" value="virtual" 
+                              <input type="radio" name="location_type" id="loc_online" value="virtual"
                                 onchange="location_toggle()" {% if location.meeting_type == "virtual" %} checked {% endif %}>
                               <label for="loc_online">Online</label>
                         </div>
@@ -84,7 +84,12 @@
 
                             <input type="radio" name="meeting_type" id="meet_doodle" value="doodle_meeting"
                                      onchange="meeting_toggle()" {% if not event.start_datetime and poll %}checked{% endif %}>
-                            <label for="meet_doodle">Abstimmung</label>
+                            <label for="meet_doodle" class="me-3">Abstimmung</label>
+
+                            <input type="radio" name="meeting_type" id="meet_none" value="none"
+                                   onchange="meeting_toggle()"
+                                   {% if not event.start_datetime and not poll %}checked{% endif %}>
+                            <label for="meet_none">Noch nicht festgelegt</label>
                         </div>
 
                         <div id="fixed_placeholder" class="mb-4" style="display: none;">
@@ -106,14 +111,15 @@
 
                         <div id="doodle_placeholder" class="mb-4" style="display: block;">
                             <label class="form-label fw-bold">Optionen für die Abstimmung</label>
-                            {% for choice in choices %}
+                            {% for i in range(3) %}
+                            {% set choice = choices[i] if choices[i] else None %}
                                 <div class="row g-2 mb-2">
-                                    <div class="col-md-4"><input type="date" name="option{{ choice.id }}_date"
-                                         class="form-control" value={{choice.date}}></div>
-                                    <div class="col-md-4"><input type="time" name="option{{ choice.id }}_start"
-                                                                             class="form-control" value={{choice.start_time.strftime('%H:%M')}}></div>
-                                    <div class="col-md-4"><input type="time" name="option{{ choice.id }}_end"
-                                                                             class="form-control" value={{choice.end_time.strftime('%H:%M')}}></div>
+                                    <div class="col-md-4"><input type="date" name="option{{ "n"~i if not choice else choice.id }}_date"
+                                                                             class="form-control" value={{ "" if not choice else choice.date }}></div>
+                                    <div class="col-md-4"><input type="time" name="option{{ "n"~i if not choice else choice.id }}_start"
+                                                                             class="form-control" value={{ "" if not choice else choice.start_time.strftime('%H:%M')}}></div>
+                                    <div class="col-md-4"><input type="time" name="option{{ "n"~i if not choice else choice.id }}_end"
+                                                                             class="form-control" value={{ "" if not choice else choice.end_time.strftime('%H:%M')}}></div>
                                 </div>
                             {% endfor %}
                         </div>

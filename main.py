@@ -1,5 +1,5 @@
 from datetime import datetime, date
-from flask import Flask, redirect, render_template, request, jsonify, url_for
+from flask import Flask, redirect, render_template, request, jsonify, url_for, abort
 import queries
 from dataclasses import dataclass
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -191,7 +191,9 @@ def get_appointment(user_id, appointment_id):
         poll_choices = queries.get_choices_by_poll_id(poll.id)
         for poll_choice in poll_choices:
             votes = queries.get_votes_by_choice(poll_choice.id)
-            choices.append(poll_choice.__dict__)
+            start_datetime = datetime.fromisoformat(poll_choice.label.split(" - ")[0])
+            end_datetime = datetime.fromisoformat(poll_choice.label.split(" - ")[1])
+            choices.append(poll_choice.__dict__ | {"start_datetime": start_datetime, "end_datetime": end_datetime})
             for vote in votes:
                 if vote.user_id == user.id:
                     choices[-1]["user_voted_yes"] = vote.can_attend
@@ -250,12 +252,12 @@ def set_fixed_date(user_id, appointment_id):
     appointment = queries.get_appointment_by_id(appointment_id)
     user = queries.get_user_by_id(user_id)
     if not appointment:
-        return "Not allowed - appointment doesnt exist"
+        abort(403)
     if user.id != appointment.user_id:
-        return "Not allowed - user not organizer"
+        abort(403)
     poll = queries.get_poll_by_appointment_id(appointment_id)
     if not poll:
-        return "Not allowed - No poll"
+        abort(403)
     choices = queries.get_choices_by_poll_id(poll.id)
     total_votes = 0
     voted = []
@@ -371,11 +373,17 @@ def update_event(user_id, appointment_id):
     fixed_start_time = request.form.get("fixed_start_time", None)
     fixed_end_time = request.form.get("fixed_end_time", None)
 
+    meeting_type = request.form.get("meeting_type", None)
+
     if fixed_date:
         # Fixes Datum eingegeben
         queries.update_appointment(appointment.id,  
                                    start_datetime=datetime.combine(fixed_date, fixed_start_time),
                                    end_datetime=datetime.combine(fixed_date, fixed_end_time))
+    elif meeting_type == "none":
+        poll = queries.get_poll_by_appointment_id(appointment.id)
+        if poll:
+            queries.delete_poll(poll.id)
     else: 
         options = []
         for key in request.form:
@@ -385,6 +393,7 @@ def update_event(user_id, appointment_id):
         for i in range(3):
             option = options[i*3:i*3+3]
             m = re.match("[0-9]+", key[6:])
+            m2 = re.match("[0-9]+", key[7:])
             if m:
                 start_idx, stop_idx = m.span()
                 option_id = option[0][6:][start_idx:stop_idx]
@@ -395,7 +404,22 @@ def update_event(user_id, appointment_id):
                 choice = queries.get_choice_by_id(option_id)
                 queries.update_choice(option_id, label=new_label)
                 choice = queries.get_choice_by_id(option_id)
- 
+            else:
+                if m2:
+                    start_idx, stop_idx = m2.span()
+                    option_id = option[0][7:][start_idx:stop_idx]
+                    option_date = request.form.get(f"optionn{option_id}_date", None)
+                    option_start = request.form.get(f"optionn{option_id}_start", None)
+                    option_end = request.form.get(f"optionn{option_id}_end", None)
+                    new_label = f"{option_date}T{option_start} - {option_date}T{option_end}"
+                    poll = queries.get_poll_by_appointment_id(appointment.id)
+                    poll_id = None
+                    if not poll:
+                        poll_id = queries.create_poll(appointment.id, "")
+                    else:
+                        poll_id = poll.id
+                    queries.create_choice(poll_id, label=new_label)
+
     return redirect(url_for("get_appointment", user_id=user.id, appointment_id=appointment.id))
 
 @app.post("/users/<user_id>/appointments/<appointment_id>/date-fix")

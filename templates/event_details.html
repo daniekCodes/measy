@@ -30,7 +30,7 @@
 
                             {% for choice in choices %}
                                 <div class="d-flex justify-content-between align-items-center mb-3 p-2 border rounded">
-                                    <span class="fw-bold">{{ choice.label }}</span>
+                                    <span class="fw-bold">{{ choice.start_datetime.strftime('%d.%m.%Y, %H:%M') }} - {{ choice.end_datetime.strftime('%H:%M') }}</span>
 
                                     <div class="btn-group" role="group">
                                         <input type="radio" class="btn-check" name="choice_{{ choice.id }}"

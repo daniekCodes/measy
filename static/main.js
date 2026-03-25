@@ -15,13 +15,23 @@ function location_toggle() {
 function meeting_toggle() {
     let fixed = document.getElementById("fixed_placeholder");
     let doodle = document.getElementById("doodle_placeholder");
-    let choice = document.querySelector('input[name="meeting_type"]:checked').value;
+    let choiceElement = document.querySelector('input[name="meeting_type"]:checked');
+
+    if (!choiceElement) {
+        fixed.style.display = 'none';
+        doodle.style.display = 'none';
+        return;
+    }
+    let choice = choiceElement.value;
 
     if (choice === 'fixed_meeting') {
         fixed.style.display = 'block';
         doodle.style.display = 'none';
-    } else {
+    } else if (choice === 'doodle_meeting') {
         fixed.style.display = 'none';
         doodle.style.display = 'block';
+    } else {
+        fixed.style.display = 'none';
+        doodle.style.display = 'none';
     }
 }

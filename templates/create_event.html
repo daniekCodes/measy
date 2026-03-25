@@ -1,109 +1,128 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row justify-content-center mt-4 mb-5">
-    <div class="col-md-8">
+    <div class="row justify-content-center mt-4 mb-5">
+        <div class="col-md-8">
 
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>Neuer Event</h2>
             <a href="{{ url_for('user_home', user_id=user.id) }}" class="btn btn-outline-secondary btn-sm">Abbrechen</a>
         </div>
 
-        <div class="card shadow-sm">
-            <div class="card-body p-4">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
 
                 <form action="{{ url_for('create_appointment', user_id=user.id) }}" method="POST">
 
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Event Name</label>
-                        <input type="text" name="title" class="form-control" required>
-                    </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Event Name</label>
+                            <input type="text" name="title" class="form-control" required>
+                        </div>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Beschreibung</label>
-                        <textarea name="description" class="form-control" rows="3"></textarea>
-                    </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Beschreibung</label>
+                            <textarea name="description" class="form-control" rows="3"></textarea>
+                        </div>
 
-                    <div class="mb-4">
-                        <label class="form-label fw-bold">Teilnehmer einladen</label>
-                        <input type="text" name="invite_emails" class="form-control">
-                        <small class="text-muted">E-Mails mit Leerzeichen trennen.</small>
-                    </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Teilnehmer einladen</label>
+                            <input type="text" name="invite_emails" class="form-control">
+                            <small class="text-muted">E-Mails mit Leerzeichen trennen.</small>
+                        </div>
 
-                    <hr class="mb-4">
+                        <hr class="mb-4">
 
-                    <div class="mb-3">
-                        <label class="form-label fw-bold d-block">Ort</label>
-                        <input type="radio" name="location_type" id="loc_physical" value="physical" onchange="location_toggle()" checked>
-                        <label for="loc_physical" class="me-3">Vor Ort</label>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold d-block">Ort</label>
+                            <input type="radio" name="location_type" id="loc_physical" value="physical"
+                                   onchange="location_toggle()" checked>
+                            <label for="loc_physical" class="me-3">Vor Ort</label>
 
                         <input type="radio" name="location_type" id="loc_online" value="virtual" onchange="location_toggle()">
                         <label for="loc_online">Online</label>
                     </div>
 
-                    <div id="physical_placeholder" class="mb-4" style="display: block;">
-                        <div class="row g-2 mb-2">
-                            <div class="col-md-8">
-                                <label class="form-label">Straße</label>
-                                <input type="text" name="street" class="form-control">
+                        <div id="physical_placeholder" class="mb-4" style="display: block;">
+                            <div class="row g-2 mb-2">
+                                <div class="col-md-8">
+                                    <label class="form-label">Straße</label>
+                                    <input type="text" name="street" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Hausnummer</label>
+                                    <input type="text" name="housenumber" class="form-control">
+                                </div>
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Hausnummer</label>
-                                <input type="text" name="housenumber" class="form-control">
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <label class="form-label">PLZ</label>
+                                    <input type="text" name="plz" class="form-control">
+                                </div>
+                                <div class="col-md-8">
+                                    <label class="form-label">Ort</label>
+                                    <input type="text" name="city" class="form-control">
+                                </div>
                             </div>
                         </div>
-                        <div class="row g-2">
-                            <div class="col-md-4">
-                                <label class="form-label">PLZ</label>
-                                <input type="text" name="plz" class="form-control">
+
+                        <div id="online_placeholder" class="mb-4" style="display: none;">
+                            <label class="form-label">Meeting-Link</label>
+                            <input type="url" name="meeting_link" class="form-control">
+                        </div>
+
+                        <hr class="mb-4">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold d-block">Datum</label>
+                            <input type="radio" name="meeting_type" id="meet_fixed" value="fixed_meeting"
+                                   onchange="meeting_toggle()">
+                            <label for="meet_fixed" class="me-3">Festes Datum</label>
+
+                            <input type="radio" name="meeting_type" id="meet_doodle" value="doodle_meeting"
+                                   onchange="meeting_toggle()">
+                            <label for="meet_doodle">Abstimmung</label>
+
+                            <input type="radio" name="meeting_type" id="meet_none" value="none"
+                                   onchange="meeting_toggle()" checked>
+                            <label for="meet_none">Noch nicht festgelegt</label>
+                        </div>
+
+                        <div id="fixed_placeholder" class="mb-4" style="display: none;">
+                            <div class="row g-2">
+                                <div class="col-md-4"><label class="form-label">Datum</label><input type="date"
+                                                                                                    name="fixed_date"
+                                                                                                    class="form-control">
+                                </div>
+                                <div class="col-md-4"><label class="form-label">Start</label><input type="time"
+                                                                                                    name="fixed_start_time"
+                                                                                                    class="form-control">
+                                </div>
+                                <div class="col-md-4"><label class="form-label">Ende</label><input type="time"
+                                                                                                   name="fixed_end_time"
+                                                                                                   class="form-control">
+                                </div>
                             </div>
-                            <div class="col-md-8">
-                                <label class="form-label">Ort</label>
-                                <input type="text" name="city" class="form-control">
-                            </div>
                         </div>
-                    </div>
 
-                    <div id="online_placeholder" class="mb-4" style="display: none;">
-                        <label class="form-label">Meeting-Link</label>
-                        <input type="url" name="meeting_link" class="form-control">
-                    </div>
-
-                    <hr class="mb-4">
-
-                    <div class="mb-3">
-                        <label class="form-label fw-bold d-block">Datum</label>
-                        <input type="radio" name="meeting_type" id="meet_fixed" value="fixed_meeting" onchange="meeting_toggle()">
-                        <label for="meet_fixed" class="me-3">Festes Datum</label>
-
-                        <input type="radio" name="meeting_type" id="meet_doodle" value="doodle_meeting" onchange="meeting_toggle()" checked>
-                        <label for="meet_doodle">Abstimmung</label>
-                    </div>
-
-                    <div id="fixed_placeholder" class="mb-4" style="display: none;">
-                        <div class="row g-2">
-                            <div class="col-md-4"><label class="form-label">Datum</label><input type="date" name="fixed_date" class="form-control"></div>
-                            <div class="col-md-4"><label class="form-label">Start</label><input type="time" name="fixed_start_time" class="form-control"></div>
-                            <div class="col-md-4"><label class="form-label">Ende</label><input type="time" name="fixed_end_time" class="form-control"></div>
+                        <div id="doodle_placeholder" class="mb-4" style="display: block;">
+                            <label class="form-label fw-bold">Optionen für die Abstimmung</label>
+                            {% for i in range(1, 4) %}
+                                <div class="row g-2 mb-2">
+                                    <div class="col-md-4"><input type="date" name="option{{ i }}_date"
+                                                                 class="form-control"></div>
+                                    <div class="col-md-4"><input type="time" name="option{{ i }}_start"
+                                                                 class="form-control"></div>
+                                    <div class="col-md-4"><input type="time" name="option{{ i }}_end"
+                                                                 class="form-control"></div>
+                                </div>
+                            {% endfor %}
                         </div>
-                    </div>
 
-                    <div id="doodle_placeholder" class="mb-4" style="display: block;">
-                        <label class="form-label fw-bold">Optionen für die Abstimmung</label>
-                        {% for i in range(1, 4) %}
-                        <div class="row g-2 mb-2">
-                            <div class="col-md-4"><input type="date" name="option{{i}}_date" class="form-control"></div>
-                            <div class="col-md-4"><input type="time" name="option{{i}}_start" class="form-control"></div>
-                            <div class="col-md-4"><input type="time" name="option{{i}}_end" class="form-control"></div>
-                        </div>
-                        {% endfor %}
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100 fw-bold">Speichern</button>
-                </form>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold">Speichern</button>
+                    </form>
+                </div>
             </div>
-        </div>
 
+        </div>
     </div>
-</div>
 {% endblock %}

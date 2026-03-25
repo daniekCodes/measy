@@ -19,9 +19,9 @@
     <div class="container-fluid">
 
 	{% if user %}
-	<a class="navbar-brand fw-bold text-primary" href={{url_for("user_home", user_id = user.id)}}>M'easy</a>
+	<a class="navbar-brand fw-bold text-muted" href={{url_for("user_home", user_id = user.id)}}>M'easy</a>
 	{% else %}
-	<a class="navbar-brand fw-bold text-primary" href={{url_for("home")}}>M'easy</a>
+	<a class="navbar-brand fw-bold text-muted" href={{url_for("home")}}>M'easy</a>
 	{% endif %}
 
         <div class="navbar-nav">
