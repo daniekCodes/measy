@@ -27,7 +27,7 @@
                 <div class="card-body p-4">
                     <form action="{{ url_for('create_vote', user_id=user.id, appointment_id=event.id) }}" method="POST">
 
-                        {% if poll %}
+                        {% if poll and not event.start_datetime %}
                             <h5 class="mb-4">Abstimmungsoptionen</h5>
 
                             {% for choice in choices %}
