@@ -2,17 +2,29 @@
 {%block content%}
 
 <div class="main_container">
-    <div>
-        <h3>Login</h3>
-        <form action={{url_for("create_user")}} method="POST">
-		<label for="email">Email</label>
-		<input type="email" name="email" required><br/>
-		<label for="name">Username</label>
-		<input type="text" name="name" required><br/>
-		<label for="password">Password</label>
-		<input type="password" name="password" required><br/>
-		<input type="submit" value="register">
-        </form>
+  <div class="row justify-content-center">
+      <h2 class="mb-4">Login</h2>
+      <div class="card shadow-sm">
+        <div class="card-body py-4">
+            <form action={{url_for("create_user")}} method="POST">
+              <div class="form-group">
+                <div class="mb-3">
+                  <label class="form-label fw-bold"for="email">Email</label>
+                  <input class="form-control" type="email" name="email" required><br/>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-bold" for="name">Benutzername</label>
+                  <input class="form-control" type="text" name="name" required><br/>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-bold" for="password">Passwort</label>
+                  <input class="form-control" type="password" name="password" required><br/>
+                </div>
+                <input class="btn btn-primary" type="submit" value="Registrieren/Einloggen">
+              </div>
+            </form>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
 {%endblock%}
