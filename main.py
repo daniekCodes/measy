@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime, date, time
 from flask import Flask, redirect, render_template, request, jsonify, url_for, abort
 import queries
 from dataclasses import dataclass
@@ -377,6 +377,9 @@ def update_event(user_id, appointment_id):
 
     if fixed_date:
         # Fixes Datum eingegeben
+        fixed_date = date.fromisoformat(fixed_date)
+        fixed_start_time = time.fromisoformat(fixed_start_time)
+        fixed_end_time = time.fromisoformat(fixed_end_time)
         queries.update_appointment(appointment.id,  
                                    start_datetime=datetime.combine(fixed_date, fixed_start_time),
                                    end_datetime=datetime.combine(fixed_date, fixed_end_time))
